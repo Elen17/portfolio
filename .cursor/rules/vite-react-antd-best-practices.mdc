@@ -1,0 +1,25 @@
+---
+description: Vite + React Router + Ant Design best practices
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# Vite / React / Ant Design best practices
+
+## React Router
+
+- Keep route components in `src/pages/`.
+- Prefer route-level code splitting (`React.lazy`) when pages grow.
+- Keep navigation state in the URL where it improves shareability (query params, path params).
+
+## Ant Design
+
+- Prefer consistent design via `ConfigProvider` theme tokens (see `src/app/theme.ts`) over one-off styling.
+- Prefer AntD layout primitives (`Row`, `Col`, `Space`, `Typography`, `Layout`) for alignment/spacing consistency.
+
+## Performance + DX
+
+- Avoid creating new arrays/objects in JSX props when it causes rerenders; move stable values to `consts.ts` or `useMemo` where needed.
+- Prefer named handlers (`const onClick = () => {}`) only when reused; inline lambdas are ok unless they cause measurable perf issues.
+- Keep CSS scoped (prefer CSS Modules) to avoid global leakage as the app grows.
+
