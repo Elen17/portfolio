@@ -1,0 +1,24 @@
+---
+description: Strict TypeScript + no eslint-disable (TS/TSX)
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Strict TypeScript (project-wide)
+
+- Keep TypeScript strict. Do not weaken compiler options (no turning off `strict`, `noUncheckedIndexedAccess` if enabled later, etc.).
+- Prefer explicit types at module boundaries (props, public hooks, API results). Inside functions, prefer inference.
+- Do not use `any`. Prefer `unknown` + narrowing.
+- Avoid non-null assertions (`!`). Prefer guards and early returns.
+
+## ESLint policy
+
+- Do not add `eslint-disable` (line/block/file). If a lint rule is noisy, adjust code or propose a config change.
+- If you must change lint config, do it in `eslint.config.js` with a narrow file pattern and a clear rationale.
+
+## React + TS patterns
+
+- Prefer `type` for React props unless you specifically need interface merging.
+- Props should be readonly by default (don’t mutate incoming objects/arrays).
+- Keep components pure; avoid side effects in render.
+
