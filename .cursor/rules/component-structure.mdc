@@ -1,0 +1,34 @@
+---
+description: Component folder structure + split styles/consts/utils
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Component structure
+
+Each React component must live in its own folder named exactly like the component (PascalCase), and export from an `index.tsx`.
+
+Example:
+
+```txt
+src/components/Hero/
+  index.tsx
+  styles.module.css   (or styles.css)
+  consts.ts
+  utils.ts
+```
+
+## Rules
+
+- `index.tsx` contains the component definition + exports.
+- `styles.module.css` (preferred) or `styles.css` contains styles. No inline styles.
+- `consts.ts` contains component-local constants (labels, arrays, config objects).
+- `utils.ts` contains component-local helpers (formatters, small pure functions).
+- If code becomes shared across components, move it to a shared place (e.g. `src/utils/` or `src/constants/`) and keep imports clean.
+
+## Naming
+
+- `ComponentName` for component folders and component functions.
+- `consts.ts` / `utils.ts` (these exact filenames).
+- Keep exports explicit (avoid `export *` from many places unless there’s a clear barrel pattern).
+

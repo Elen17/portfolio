@@ -1,0 +1,22 @@
+---
+description: Core project standards (Vite + React + TS + AntD)
+alwaysApply: true
+---
+
+# Core standards
+
+- Keep changes small and consistent with existing patterns in `src/`.
+- Use `pnpm` for all package management commands.
+- Prefer readability over cleverness; avoid premature abstraction.
+
+## Styling
+
+- Do **not** use inline styles (`style={{ ... }}`) in JSX.
+- Prefer colocated component styles (see component structure rule) or shared styles in `src/styles/`.
+
+## TypeScript + linting
+
+- TypeScript must remain `strict: true`.
+- Do not add `// eslint-disable` / `/* eslint-disable */` comments. Fix the underlying issue instead.
+- Avoid `any`. If you must use it, isolate it behind a well-typed boundary and document why in the PR/commit message (not as `eslint-disable`).
+

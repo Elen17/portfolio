@@ -1,0 +1,37 @@
+---
+description: No inline styles in React components
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# No inline styles
+
+Do not use:
+
+- `style={{ ... }}`
+- `style={someObject}`
+
+Instead use one of:
+
+- Colocated CSS file per component folder (preferred): `styles.css` or `styles.module.css`
+- Shared stylesheet(s) in `src/styles/` for truly global layout/typography
+- Ant Design theming tokens via `ConfigProvider` / `theme.ts` for design-system consistency
+
+## Examples
+
+Bad:
+
+```tsx
+<div style={{ width: '86%' }} />
+```
+
+Good (CSS):
+
+```tsx
+<div className={styles.meterFill} />
+```
+
+```css
+.meterFill { width: 86%; }
+```
+
