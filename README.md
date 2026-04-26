@@ -37,6 +37,7 @@ corepack pnpm preview
 ## Deploy to Vercel
 
 - **Framework**: Vite
+- **Install command**: `corepack pnpm install`
 - **Build command**: `corepack pnpm build`
 - **Output directory**: `dist`
 
