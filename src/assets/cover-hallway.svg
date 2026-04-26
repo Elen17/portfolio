@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="g0" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1a24"/>
+      <stop offset="1" stop-color="#0b0b10"/>
+    </linearGradient>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a855f7" stop-opacity="0.65"/>
+      <stop offset="0.6" stop-color="#6366f1" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g0)"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#g1)"/>
+
+  <!-- corridor -->
+  <g opacity="0.95">
+    <path d="M360 760 L480 200 L720 200 L840 760 Z" fill="#0f0f16" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+    <path d="M470 200 L470 760" stroke="rgba(255,255,255,0.09)" stroke-width="2"/>
+    <path d="M540 200 L540 760" stroke="rgba(255,255,255,0.07)" stroke-width="2"/>
+    <path d="M660 200 L660 760" stroke="rgba(255,255,255,0.07)" stroke-width="2"/>
+    <path d="M730 200 L730 760" stroke="rgba(255,255,255,0.09)" stroke-width="2"/>
+
+    <path d="M480 200 L600 80 L720 200" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+    <rect x="520" y="112" width="160" height="12" rx="6" fill="rgba(255,255,255,0.10)"/>
+    <rect x="536" y="114" width="128" height="8" rx="4" fill="rgba(168,85,247,0.28)"/>
+  </g>
+
+  <!-- subtle vignette -->
+  <rect width="1200" height="800" fill="url(#g2)"/>
+</svg>
+

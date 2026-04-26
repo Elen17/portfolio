@@ -1,0 +1,26 @@
+---
+description: Third-party integrations live under src/api
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# API integrations package (`src/api`)
+
+When adding any 3rd-party integration (Gemini, Stripe, Email providers, analytics, etc.):
+
+- **Create a folder under** `src/api/<provider>/`
+- **Keep HTTP clients and SDK usage inside** `src/api/**` (components/pages should not call axios/fetch directly)
+- **Export a small, typed surface** from `src/api/<provider>/index.ts`
+- **Keep env var reads inside** the integration package (e.g. `VITE_*` access in `src/api/**`)
+- **Prefer explicit, typed functions** over generic wrappers
+
+## Example layout
+
+```text
+src/api/
+  gemini/
+    client.ts
+    types.ts
+    index.ts
+```
+

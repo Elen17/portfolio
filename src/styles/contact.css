@@ -1,0 +1,143 @@
+.contact2 {
+  padding-top: 6px;
+}
+
+.contact2-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.contact2-title {
+  margin-top: 0 !important;
+  margin-bottom: 12px !important;
+  font-size: clamp(46px, 5vw, 64px) !important;
+  line-height: 1.02 !important;
+}
+
+.contact2-desc {
+  max-width: 56ch;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 24px;
+}
+
+.contact2-meta {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.contact2-chip {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.03);
+  max-width: 420px;
+}
+
+.contact2-chip__icon {
+  color: rgba(168, 85, 247, 0.9);
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.contact2-chip__label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+}
+
+.contact2-chip__value {
+  display: block;
+  margin-top: 4px;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.contact2-chip__hint {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+}
+
+.contact2-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 520px;
+}
+
+.contact2-miniLabel {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.contact2-miniValue {
+  display: block;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 6px;
+}
+
+.contact2-card {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.contact2-card .ant-card-body {
+  padding: 18px 18px 16px;
+}
+
+.contact2-card__accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, rgba(168, 85, 247, 1), rgba(99, 102, 241, 0.55));
+}
+
+.contact2-card .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  font-size: 11px;
+}
+
+.contact2-submit {
+  min-width: 220px;
+  justify-content: space-between;
+}
+
+.contact2-map {
+  margin-top: 12px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.contact2-map__img {
+  width: 100%;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .contact2-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,0 +1,64 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.page {
+  padding: 24px 20px 56px;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.top-nav__brand {
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.86);
+  user-select: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.top-nav__brand:hover,
+.top-nav__brand:focus-visible {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: underline;
+  text-decoration-color: rgba(168, 85, 247, 0.6);
+  text-underline-offset: 6px;
+}
+
+.top-nav__menu {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border-bottom: none;
+}
+
+.top-nav__cta {
+  box-shadow: 0 10px 24px rgba(168, 85, 247, 0.18);
+}
+
+.footer {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer__inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+

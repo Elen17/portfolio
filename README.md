@@ -20,12 +20,31 @@ corepack pnpm install
 corepack pnpm dev
 ```
 
+## Gemini Chat (optional)
+
+Create `.env.local` from `.env.example` and set:
+
+- `VITE_GEMINI_API_KEY`
+- `VITE_GEMINI_MODEL` (optional, default: `gemini-2.5-flash`)
+
 Build:
 
 ```bash
 corepack pnpm build
 corepack pnpm preview
 ```
+
+## Deploy to Vercel
+
+- **Framework**: Vite
+- **Build command**: `corepack pnpm build`
+- **Output directory**: `dist`
+
+SPA routing (`react-router-dom`) is supported via `vercel.json` rewrites.
+
+If/when you enable chat in production, add this environment variable in Vercel:
+
+- `VITE_GEMINI_API_KEY`
 
 ## Planned features
 
