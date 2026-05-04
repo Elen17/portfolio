@@ -26,9 +26,7 @@ describe('GeminiChatPage', () => {
     render(<GeminiChatPage />)
 
     expect(screen.getByRole('heading', { name: /gemini chat integration/i })).toBeInTheDocument()
-    expect(
-      screen.getByText(/ask something like/i),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/ask something like/i)).toBeInTheDocument()
   })
 
   it('shows a success alert when Gemini env configuration is detected', () => {
@@ -117,3 +115,4 @@ describe('GeminiChatPage', () => {
     expect(screen.getByText(/ask something like/i)).toBeInTheDocument()
   })
 })
+
