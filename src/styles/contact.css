@@ -6,9 +6,16 @@
   display: inline-block;
   font-size: 11px;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.55);
   margin-bottom: 12px;
   text-transform: uppercase;
+}
+
+[data-theme='dark'] .contact2-eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .contact2-eyebrow {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .contact2-title {
@@ -20,8 +27,16 @@
 
 .contact2-desc {
   max-width: 56ch;
-  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 24px;
+}
+
+
+[data-theme='dark'] .contact2-desc {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme='light'] .contact2-desc {
+  color: rgba(0, 0, 0, 0.7);
 }
 
 .contact2-meta {
@@ -50,8 +65,16 @@
   display: block;
   font-size: 11px;
   letter-spacing: 1.8px;
-  color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
+}
+
+
+[data-theme='dark'] .contact2-chip__label {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .contact2-chip__label {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .contact2-chip__value {
@@ -61,11 +84,27 @@
   color: rgba(255, 255, 255, 0.92);
 }
 
+
+[data-theme='dark'] .contact2-chip__value {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+[data-theme='light'] .contact2-chip__value {
+  color: rgba(0, 0, 0, 0.92);
+}
+
 .contact2-chip__hint {
   display: block;
   margin-top: 2px;
-  color: rgba(255, 255, 255, 0.55);
   font-size: 12px;
+}
+
+[data-theme='dark'] .contact2-chip__hint {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .contact2-chip__hint {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .contact2-grid {
@@ -79,15 +118,31 @@
   display: block;
   font-size: 11px;
   letter-spacing: 1.8px;
-  color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
   margin-bottom: 6px;
 }
 
+
+[data-theme='dark'] .contact2-miniLabel {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .contact2-miniLabel {
+  color: rgba(0, 0, 0, 0.55);
+}
+
 .contact2-miniValue {
   display: block;
-  color: rgba(255, 255, 255, 0.82);
   margin-bottom: 6px;
+}
+
+
+[data-theme='dark'] .contact2-miniValue {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+[data-theme='light'] .contact2-miniValue {
+  color: rgba(0, 0, 0, 0.82);
 }
 
 .contact2-card {
@@ -111,10 +166,18 @@
 }
 
 .contact2-card .ant-form-item-label > label {
-  color: rgba(255, 255, 255, 0.62);
   text-transform: uppercase;
   letter-spacing: 1.4px;
   font-size: 11px;
+}
+
+
+[data-theme='dark'] .contact2-card .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+[data-theme='light'] .contact2-card .ant-form-item-label > label {
+  color: rgba(0, 0, 0, 0.62);
 }
 
 .contact2-submit {

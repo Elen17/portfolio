@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import hallwayUrl from '../assets/cover-hallway.svg'
 import circuitUrl from '../assets/cover-circuit.svg'
 import '../styles/cover.css'
+import { ExternalService, openExternalURL } from '../utils/utlis'
 
 const { Title, Paragraph, Text } = Typography
 
@@ -15,7 +16,7 @@ const PRINCIPLES = [
 ]
 
 export default function CoverPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="cover">
@@ -112,11 +113,7 @@ export default function CoverPage() {
             <Button
               type="primary"
               icon={<DownloadOutlined />}
-              onClick={() => {
-                // placeholder interaction until real CV file is added
-                navigate('/contact')
-              }}
-            >
+              onClick={() => openExternalURL(ExternalService.CV)}>
               Download Full CV
             </Button>
             <Button icon={<MailOutlined />} onClick={() => navigate('/contact')}>

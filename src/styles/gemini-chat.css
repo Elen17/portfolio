@@ -17,7 +17,6 @@
   display: inline-block;
   font-size: 11px;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.55);
   margin-bottom: 10px;
   text-transform: uppercase;
 }
@@ -29,7 +28,6 @@
 .gchat-desc {
   margin: 0;
   max-width: 72ch;
-  color: rgba(255, 255, 255, 0.7);
 }
 
 .gchat-card {
@@ -79,23 +77,17 @@
   display: block;
   font-size: 11px;
   letter-spacing: 1.6px;
-  color: rgba(255, 255, 255, 0.58);
   text-transform: uppercase;
   margin-bottom: 6px;
 }
 
 .gchat-bubble__text {
   white-space: pre-wrap;
-  color: rgba(255, 255, 255, 0.85);
   line-height: 1.45;
 }
 
-.gchat-bubble__text--loading {
-  color: rgba(255, 255, 255, 0.65);
-}
 
 .gchat-bubble__markdown {
-  color: rgba(255, 255, 255, 0.85);
   line-height: 1.45;
 }
 
@@ -124,7 +116,6 @@
 
 .gchat-bubble__markdown :where(h1, h2, h3, h4) {
   margin: 10px 0 8px;
-  color: rgba(255, 255, 255, 0.92);
 }
 
 .gchat-bubble__markdown :where(code) {
@@ -153,7 +144,6 @@
   border: none;
   padding: 0;
   display: block;
-  color: rgba(255, 255, 255, 0.86);
 }
 
 .gchat-bubble__markdown :where(blockquote) {
@@ -162,7 +152,6 @@
   border-left: 3px solid rgba(168, 85, 247, 0.9);
   background: rgba(168, 85, 247, 0.06);
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.78);
 }
 
 .gchat-bubble__markdown :where(hr) {
@@ -180,3 +169,36 @@
   gap: 6px;
 }
 
+
+[data-theme='dark'] .gchat-eyebrow, .gchat-desc, .gchat-bubble__role, .gchat-bubble__text, .gchat-bubble__text--loading, .gchat-bubble__markdown {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .gchat-eyebrow, .gchat-desc, .gchat-bubble__role, .gchat-bubble__text, .gchat-bubble__text--loading, .gchat-bubble__markdown{
+  color: rgba(0, 0, 0, 0.55);
+}
+
+[data-theme='dark'] .gchat-bubble__markdown :where(h1, h2, h3, h4) {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+[data-theme='light'] .gchat-bubble__markdown :where(h1, h2, h3, h4){
+  color: rgba(0, 0, 0, 0.92);
+}
+
+
+[data-theme='dark'] .gchat-bubble__markdown :where(pre > code) {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+[data-theme='light'] .gchat-bubble__markdown :where(pre > code) {
+  color: rgba(0, 0, 0, 0.86);
+}
+
+[data-theme='dark'] .gchat-bubble__markdown :where(blockquote) {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+[data-theme='light'] .gchat-bubble__markdown :where(blockquote) {
+  color: rgba(0, 0, 0, 0.78);
+}

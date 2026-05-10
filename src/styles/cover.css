@@ -8,9 +8,17 @@
   display: inline-block;
   font-size: 11px;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.55);
   margin-bottom: 10px;
   text-transform: uppercase;
+}
+
+
+[data-theme='dark'] .cover-eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .cover-eyebrow {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .cover-hero {
@@ -26,9 +34,17 @@
 
 .cover-hero__desc {
   max-width: 62ch;
-  color: rgba(255, 255, 255, 0.7);
   font-size: 15px;
   margin-bottom: 0;
+}
+
+
+[data-theme='dark'] .cover-hero__desc {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme='light'] .cover-hero__desc {
+  color: rgba(0, 0, 0, 0.7);
 }
 
 .cover-hero__image {
@@ -53,8 +69,16 @@
 }
 
 .cover-section__desc {
-  color: rgba(255, 255, 255, 0.65);
   margin: 0 0 12px;
+}
+
+
+[data-theme='dark'] .cover-section__desc {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme='light'] .cover-section__desc {
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .principles {
@@ -77,13 +101,28 @@
 
 .principle-card__title {
   font-weight: 650;
-  color: rgba(255, 255, 255, 0.90);
+}
+
+[data-theme='dark'] .principle-card__title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme='light'] .principle-card__title {
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .principle-card__subtitle {
   font-size: 11px;
   letter-spacing: 1.6px;
+}
+
+
+[data-theme='dark'] .principle-card__subtitle {
   color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .principle-card__subtitle {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .cover-archival {
@@ -123,8 +162,12 @@
   font-size: 16px;
 }
 
-.cover-list__text {
+[data-theme='dark'] .cover-list__text {
   color: rgba(255, 255, 255, 0.82);
+}
+
+[data-theme='light'] .cover-list__text {
+  color: rgba(0, 0, 0, 0.82);
 }
 
 .cover-cta {

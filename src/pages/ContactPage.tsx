@@ -1,10 +1,8 @@
 import { EnvironmentOutlined, MailOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Form, Input, Row, Select, Space, Typography } from 'antd'
+import { Button, Card, Col, Form, Input, message, Row, Select, Space, Typography } from 'antd'
 import '../styles/contact.css'
-import mapUrl from '../assets/contact-map.svg'
-
+import emailjs from "@emailjs/browser";
 const { Title, Paragraph, Text } = Typography
-
 type ContactValues = {
   name: string
   email: string
@@ -14,6 +12,28 @@ type ContactValues = {
 
 export default function ContactPage() {
   const [form] = Form.useForm<ContactValues>()
+
+  const handleSubmit = async (values: ContactValues) => {
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          name: values.name,
+          email: values.email,
+          subject: values.subject,
+          message: values.message,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      )
+
+      message.success('Message sent successfully!')
+      form.resetFields()
+    } catch (error) {
+      console.error(error)
+      message.error('Failed to send message')
+    }
+  }
 
   return (
     <div className="contact2">
@@ -37,20 +57,8 @@ export default function ContactPage() {
               <EnvironmentOutlined className="contact2-chip__icon" />
               <div>
                 <Text className="contact2-chip__label">CURRENT BASE</Text>
-                <Text className="contact2-chip__value">San Francisco, CA</Text>
-                <Text className="contact2-chip__hint">Pacific Standard Time (UTC-8)</Text>
-              </div>
-            </div>
-
-            <div className="contact2-grid">
-              <div>
-                <Text className="contact2-miniLabel">DIRECT SIGNAL</Text>
-                <Text className="contact2-miniValue">hello@elen.studio</Text>
-              </div>
-              <div>
-                <Text className="contact2-miniLabel">NETWORK</Text>
-                <Text className="contact2-miniValue">elen-khachatryan (LinkedIn)</Text>
-                <Text className="contact2-miniValue">elen-archival (GitHub)</Text>
+                <Text className="contact2-chip__value">Yerevan, Armenia</Text>
+                <Text className="contact2-chip__hint">(GMT+4)</Text>
               </div>
             </div>
           </div>
@@ -63,12 +71,7 @@ export default function ContactPage() {
               form={form}
               layout="vertical"
               requiredMark={false}
-              onFinish={(values) => {
-                const subject = values.subject || 'Architectural Inquiry'
-                const body = `${values.message}\n\nFrom: ${values.name} <${values.email}>`
-                window.location.href = `mailto:elen@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-              }}
-            >
+              onFinish={handleSubmit}>
               <Form.Item<ContactValues>
                 label="Your name"
                 name="name"
@@ -85,7 +88,7 @@ export default function ContactPage() {
                   { type: 'email', message: 'Please enter a valid email' },
                 ]}
               >
-                <Input placeholder="john@company.com" />
+                <Input placeholder="john.doe@gmail.com" />
               </Form.Item>
 
               <Form.Item<ContactValues> label="Subject" name="subject" initialValue="Architectural Inquiry">
@@ -122,10 +125,6 @@ export default function ContactPage() {
               </Space>
             </Form>
           </Card>
-
-          <div className="contact2-map" aria-hidden="true">
-            <img className="contact2-map__img" src={mapUrl} alt="" />
-          </div>
         </Col>
       </Row>
     </div>

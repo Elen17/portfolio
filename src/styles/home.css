@@ -6,8 +6,16 @@
   display: inline-block;
   font-size: 11px;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.55);
   margin-bottom: 10px;
+}
+
+
+[data-theme='dark'] .eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .eyebrow {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .hero__title {
@@ -17,27 +25,56 @@
   line-height: 1.05 !important;
 }
 
-.accent {
+[data-theme='dark'] .accent {
   color: #a855f7;
+}
+
+[data-theme='light'] .accent {
+  color: #55f7e7;
 }
 
 .hero__desc {
   max-width: 54ch;
-  color: rgba(255, 255, 255, 0.7);
   font-size: 15px;
 }
 
+
+[data-theme='dark'] .hero__desc {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme='light'] .hero__desc {
+  color: rgba(0, 0, 0, 0.7);
+}
+
 .hero__divider {
-  border-color: rgba(255, 255, 255, 0.08) !important;
   margin: 22px 0 14px !important;
 }
 
-.stats .ant-statistic-title {
+[data-theme='dark'] .hero__divider {
+  color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='light'] .hero__divider {
+  color: rgba(0, 0, 0, 0.08);
+}
+
+
+[data-theme='dark'] .stats .ant-statistic-title {
   color: rgba(255, 255, 255, 0.55);
 }
 
-.stats .ant-statistic-content {
+[data-theme='light'] .stats .ant-statistic-title {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+
+[data-theme='dark'] .stats .ant-statistic-content {
   color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme='light'] .stats .ant-statistic-content {
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .portrait {
@@ -73,15 +110,31 @@
   gap: 2px;
 }
 
+
 .portrait__badge-label {
   font-size: 11px;
+}
+
+
+[data-theme='dark'] .portrait__badge {
   color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme='light'] .portrait__badge {
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .portrait__badge-name {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
+}
+
+[data-theme='dark'] .portrait__badge-name {
+  color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='light'] .portrait__badge-name {
+  color: rgba(0, 0, 0, 0.08);
 }
 
 .section {
@@ -95,7 +148,14 @@
 
 .section__desc {
   margin: 0;
+}
+
+[data-theme='dark'] .section__desc {
   color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme='light'] .section__desc {
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .skills {
@@ -111,8 +171,16 @@
 }
 
 .skill-card__kicker {
-  color: rgba(255, 255, 255, 0.55);
   font-size: 12px;
+}
+
+
+[data-theme='dark'] .skill-card__kicker {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='light'] .skill-card__kicker {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .skill-card__title {
@@ -120,8 +188,16 @@
 }
 
 .skill-card__desc {
-  color: rgba(255, 255, 255, 0.65);
   min-height: 64px;
+}
+
+
+[data-theme='dark'] .skill-card__desc {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme='light'] .skill-card__desc {
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .skill-card__meter {
@@ -164,8 +240,16 @@
 
 .cta__desc {
   margin: 0;
-  color: rgba(255, 255, 255, 0.65);
   max-width: 60ch;
+}
+
+
+[data-theme='dark'] .cta__desc {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme='light'] .cta__desc {
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .cta__actions {
