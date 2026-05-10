@@ -1,5 +1,5 @@
 import { DeleteOutlined, SendOutlined } from '@ant-design/icons'
-import { Alert, Button, Card, Input, Space, Typography } from 'antd'
+import { Alert, Button, Card, Input, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { generateGeminiReply, isGeminiConfigured, type ChatMessage } from '../api/gemini'
 import '../styles/gemini-chat.css'
@@ -14,6 +14,13 @@ function createId() {
 }
 
 const STORAGE_KEY = 'portfolio.geminiChat.v1'
+
+const SUGGESTIONS = [
+  'What technologies do you specialize in?',
+  'Tell me about your most recent project.',
+  "What's your experience with backend systems?",
+  'How do you approach system design?',
+]
 
 export default function GeminiChatPage() {
   const [draft, setDraft] = useState('')
@@ -35,42 +42,61 @@ export default function GeminiChatPage() {
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    if (messages.length === 0) {
+      localStorage.removeItem(STORAGE_KEY)
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    }
   }, [messages])
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages.length, busy])
 
-  const send = async () => {
-    const text = draft.trim()
-    if (!text || busy) return
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort()
+    }
+  }, [])
+
+  const sendText = async (text: string) => {
+    const trimmed = text.trim()
+    if (!trimmed || busy) return
 
     setError(null)
     setDraft('')
 
-    const userMsg: ChatMessage = { id: createId(), role: 'user', text }
-    setMessages((prev) => [...prev, userMsg])
+    const userMsg: ChatMessage = { id: createId(), role: 'user', text: trimmed }
+    const modelMsgId = createId()
 
+    setMessages((prev) => [...prev, userMsg, { id: modelMsgId, role: 'model', text: '' }])
     setBusy(true)
+
     abortRef.current?.abort()
     abortRef.current = new AbortController()
 
     try {
-      const reply = await generateGeminiReply({
+      await generateGeminiReply({
         messages: [...messages, userMsg],
         cvMarkdown,
         signal: abortRef.current.signal,
+        onChunk: (partial) => {
+          setMessages((prev) => prev.map((m) => (m.id === modelMsgId ? { ...m, text: partial } : m)))
+        },
       })
-      const modelMsg: ChatMessage = { id: createId(), role: 'model', text: reply }
-      setMessages((prev) => [...prev, modelMsg])
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to reach Gemini.'
-      setError(msg)
+      if (e instanceof Error && e.name === 'AbortError') {
+        setMessages((prev) => prev.filter((m) => m.id !== modelMsgId || m.text.trim()))
+        return
+      }
+      setMessages((prev) => prev.filter((m) => m.id !== modelMsgId))
+      setError(e instanceof Error ? e.message : 'Failed to reach Gemini.')
     } finally {
       setBusy(false)
     }
   }
+
+  const send = () => sendText(draft)
 
   const clear = () => {
     abortRef.current?.abort()
@@ -78,8 +104,10 @@ export default function GeminiChatPage() {
     setError(null)
     setMessages([])
     setDraft('')
-    localStorage.removeItem(STORAGE_KEY)
   }
+
+  const isStreamingLast =
+    busy && messages.length > 0 && messages[messages.length - 1].role === 'model'
 
   return (
     <div className="gchat">
@@ -122,38 +150,66 @@ export default function GeminiChatPage() {
         />
       )}
 
-      {error && <Alert type="error" showIcon message="Request failed" description={error} />}
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message="Request failed"
+          description={error}
+          closable
+          onClose={() => setError(null)}
+        />
+      )}
 
       <Card className="gchat-card">
         <div className="gchat-thread" ref={scrollRef} aria-label="Chat transcript">
           {messages.length === 0 ? (
             <div className="gchat-empty">
-              <Text type="secondary">Ask something like “Review my portfolio UX and suggest improvements”.</Text>
+              <Text type="secondary" className="gchat-empty__hint">
+                Ask something about the portfolio, for example:
+              </Text>
+              <div className="gchat-suggestions">
+                {SUGGESTIONS.map((s) => (
+                  <button key={s} className="gchat-suggestion" onClick={() => void sendText(s)} disabled={busy}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
-            messages.map((m) => (
-              <div key={m.id} className={m.role === 'user' ? 'gchat-bubble gchat-bubble--user' : 'gchat-bubble'}>
-                <Text className="gchat-bubble__role">{m.role === 'user' ? 'You' : 'Gemini'}</Text>
-                {m.role === 'user' ? (
-                  <div className="gchat-bubble__text">{m.text}</div>
-                ) : (
-                  <div className="gchat-bubble__markdown">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-          {busy && (
-            <div className="gchat-bubble">
-              <Text className="gchat-bubble__role">Gemini</Text>
-              <div className="gchat-bubble__text gchat-bubble__text--loading">Thinking…</div>
-            </div>
+            messages.map((m, i) => {
+              const streaming = isStreamingLast && i === messages.length - 1
+              return (
+                <div
+                  key={m.id}
+                  className={[
+                    'gchat-bubble',
+                    m.role === 'user' ? 'gchat-bubble--user' : '',
+                    streaming ? 'gchat-bubble--streaming' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  <Text className="gchat-bubble__role">{m.role === 'user' ? 'You' : 'Gemini'}</Text>
+                  {m.role === 'user' ? (
+                    <div className="gchat-bubble__text">{m.text}</div>
+                  ) : (
+                    <div className="gchat-bubble__markdown">
+                      {m.text ? (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown>
+                      ) : (
+                        <span className="gchat-bubble__text gchat-bubble__text--loading">Thinking…</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })
           )}
         </div>
 
-        <Space.Compact className="gchat-compose">
-          <Input
+        <div className="gchat-compose">
+          <Input.TextArea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
@@ -162,16 +218,21 @@ export default function GeminiChatPage() {
                 void send()
               }
             }}
-            placeholder="Type a message…"
+            placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
             disabled={busy}
+            autoSize={{ minRows: 1, maxRows: 5 }}
             aria-label="Message input"
           />
-          <Button type="primary" icon={<SendOutlined />} onClick={() => void send()} disabled={busy || !draft.trim()}>
+          <Button
+            type="primary"
+            icon={<SendOutlined />}
+            onClick={() => void send()}
+            disabled={busy || !draft.trim()}
+          >
             Send
           </Button>
-        </Space.Compact>
+        </div>
       </Card>
     </div>
   )
 }
-

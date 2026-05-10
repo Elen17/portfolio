@@ -21,7 +21,7 @@ const NAV_ITEMS: Item[] = [
   { key: 'cover', label: 'Cover', path: '/cover' },
   { key: 'skills', label: 'Skills', path: '/skills' },
   { key: 'contact', label: 'Contact', path: '/contact' },
-  { key: 'chat', label: 'Gemini Chat', path: '/chat' },
+  { key: 'chat', label: 'Assistant', path: '/chat' },
 ]
 
 function getSelectedKey(pathname: string): NavKey {
@@ -67,7 +67,7 @@ export default function AppLayout({ theme, setTheme}: Props) {
           onClick={() => handleNavigation('contact')}>
           Contact Me
         </Button>
-        <Form.Item valuePropName="checked">
+        <Form.Item valuePropName="checked" className='switch-item'>
           <Switch defaultChecked 
                   onClick={() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))}/>
         </Form.Item>

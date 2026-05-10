@@ -120,16 +120,12 @@
   gap: 12px;
 }
 
-.skills2-microCard,
-.skills2-featureCard,
-.skills2-forgeCard {
+.skills2-microCard, .skills2-featureCard, .skills2-forgeCard {
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: rgba(255, 255, 255, 0.03);
 }
 
-.skills2-microCard .ant-card-body,
-.skills2-featureCard .ant-card-body,
-.skills2-forgeCard .ant-card-body {
+.skills2-microCard .ant-card-body, .skills2-featureCard .ant-card-body, .skills2-forgeCard, .ant-card-body {
   padding: 16px;
 }
 
@@ -271,14 +267,22 @@
 }
 
 
-[data-theme='dark'] .skills2-icon, .skills2-microCard__title,
-.skills2-forgeCard__title,
-.skills2-featureCard__title {
+[data-theme='dark'] .skills2-icon,
+[data-theme='dark'] .skills2-microCard__title,
+[data-theme='dark'] .skills2-forgeCard__title,
+[data-theme='dark'] .skills2-forgeCard__subtitle,
+[data-theme='dark'] .skills2-featureCard__subtitle,
+[data-theme='dark'] .skills2-tag,
+[data-theme='dark'] .skills2-featureCard__title {
   color: rgba(255, 255, 255, 0.92);
 }
 
-[data-theme='light'] .skills2-icon, .skills2-microCard__title,
-.skills2-forgeCard__title,
-.skills2-featureCard__title {
+[data-theme='light'] .skills2-icon,
+[data-theme='light'] .skills2-microCard__title,
+[data-theme='light'] .skills2-forgeCard__title,
+[data-theme='light'] .skills2-forgeCard__subtitle,
+[data-theme='light'] .skills2-featureCard__subtitle,
+[data-theme='light'] .skills2-tag,
+[data-theme='light'] .skills2-featureCard__title {
   color: rgba(0, 0, 0, 0.92);
 }

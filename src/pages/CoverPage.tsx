@@ -1,8 +1,8 @@
 import { CheckCircleFilled, DownloadOutlined, MailOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Space, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import hallwayUrl from '../assets/cover-hallway.svg'
-import circuitUrl from '../assets/cover-circuit.svg'
+import hallwayUrl from '../assets/cover-hallway.jpg'
+import circuitUrl from '../assets/cover-circuit.png'
 import '../styles/cover.css'
 import { ExternalService, openExternalURL } from '../utils/utlis'
 
@@ -23,11 +23,14 @@ export default function CoverPage() {
       <section className="cover-hero">
         <Row gutter={[24, 24]} align="middle">
           <Col xs={24} lg={13}>
-            <Text className="cover-eyebrow">THE ARCHITECT’S NOTE</Text>
-            <Title className="cover-hero__title">Crafting Elegance in Complexity</Title>
+            <Title className="cover-hero__title">
+              Software Engineer Focused on Scalable Architecture
+            </Title>
             <Paragraph className="cover-hero__desc">
-              Architecture is not just code — it’s the art of structuring systems that scale with intent. I build products
-              where clean flow, safe design, and pragmatic behavior meet each architectural purity.
+              Experienced in designing and developing enterprise-grade applications using
+              Java, Spring, Angular, and modern cloud-native practices. Passionate about
+              clean architecture, efficient system design, and building reliable software
+              solutions that remain maintainable as products evolve.
             </Paragraph>
           </Col>
           <Col xs={24} lg={11}>
@@ -43,16 +46,20 @@ export default function CoverPage() {
           <Col xs={24} lg={12}>
             <Text className="cover-eyebrow">The Journey</Text>
             <Title level={3} className="cover-section__title">
-              From Concept to Crafted Systems
+              Evolving from Interfaces to Architecture
             </Title>
             <Paragraph className="cover-section__desc">
-              Starting as a frontend engineer, I’ve grown into shaping both the UI and the system foundations that hold
-              it. Today I balance performance, reliability, and developer experience so products remain clear under
-              change.
+              My journey began with frontend development, crafting intuitive and
+              responsive user experiences with Angular and modern web technologies.
+              Over time, curiosity about how systems truly operate led me deeper into
+              backend engineering, integrations, and scalable architecture design.
             </Paragraph>
             <Paragraph className="cover-section__desc">
-              My methodology treats every project as a “living archive”: each feature is built with intent, reviewed for
-              clarity, and shipped with durable patterns.
+              Today, I build enterprise-grade applications that balance clean user
+              experience with reliable system foundations. From REST services and
+              distributed integrations to maintainable frontend ecosystems, I focus on
+              creating software that remains scalable, understandable, and resilient as
+              products evolve.
             </Paragraph>
           </Col>
 
@@ -77,27 +84,51 @@ export default function CoverPage() {
             </div>
           </Col>
           <Col xs={24} lg={12}>
-            <Text className="cover-eyebrow">The Archival Method</Text>
+            <Text className="cover-eyebrow">Engineering Principles</Text>
+
             <Title level={3} className="cover-section__title">
-              Systems that stay readable
+              Building Systems That Remain Maintainable
             </Title>
+
             <Paragraph className="cover-section__desc">
-              My philosophy revolves around “TDD Trail Driven Development” and tight feedback loops. I believe the
-              strongest systems remain self-documenting, highly observable, and resilient to change.
+              I approach software engineering with a strong emphasis on clarity,
+              scalability, and long-term maintainability. Clean architecture, fast
+              feedback loops, and thoughtful system boundaries help ensure applications
+              remain reliable as complexity grows.
             </Paragraph>
 
-            <ul className="cover-list" aria-label="Method highlights">
+            <Paragraph className="cover-section__desc">
+              My focus is not only delivering features, but building foundations that
+              teams can confidently extend, debug, and evolve over time.
+            </Paragraph>
+
+            <ul className="cover-list" aria-label="Engineering principles">
               <li className="cover-list__item">
                 <CheckCircleFilled className="cover-list__icon" />
-                <span className="cover-list__text">Automated test suites</span>
+                <span className="cover-list__text">
+                  Automated testing and quality-focused development
+                </span>
               </li>
+
               <li className="cover-list__item">
                 <CheckCircleFilled className="cover-list__icon" />
-                <span className="cover-list__text">Clean domain + orchestration</span>
+                <span className="cover-list__text">
+                  Clean architecture and maintainable domain design
+                </span>
               </li>
+
               <li className="cover-list__item">
                 <CheckCircleFilled className="cover-list__icon" />
-                <span className="cover-list__text">Microservices isolation</span>
+                <span className="cover-list__text">
+                  Scalable integrations and microservice-oriented systems
+                </span>
+              </li>
+
+              <li className="cover-list__item">
+                <CheckCircleFilled className="cover-list__icon" />
+                <span className="cover-list__text">
+                  Performance, observability, and production reliability
+                </span>
               </li>
             </ul>
           </Col>
@@ -107,7 +138,7 @@ export default function CoverPage() {
       <section className="cover-cta" aria-label="Call to action">
         <div className="cover-cta__inner">
           <Title level={2} className="cover-cta__title">
-            Ready to Build the Next Archive?
+            Let’s Build Reliable Software Together
           </Title>
           <Space size={12} wrap className="cover-cta__actions">
             <Button

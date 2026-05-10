@@ -19,14 +19,19 @@ describe('GeminiChatPage', () => {
     localStorage.clear()
     vi.clearAllMocks()
     mockIsGeminiConfigured.mockReturnValue(true)
-    mockGenerateGeminiReply.mockResolvedValue('Here is a concise reply.')
+    // Simulate streaming: call onChunk with the reply text, then resolve
+    mockGenerateGeminiReply.mockImplementation(async ({ onChunk }) => {
+      const reply = 'Here is a concise reply.'
+      onChunk?.(reply)
+      return reply
+    })
   })
 
   it('renders the page title and empty-thread hint without crashing', () => {
     render(<GeminiChatPage />)
 
     expect(screen.getByRole('heading', { name: /gemini chat integration/i })).toBeInTheDocument()
-    expect(screen.getByText(/ask something like/i)).toBeInTheDocument()
+    expect(screen.getByText(/ask something about the portfolio/i)).toBeInTheDocument()
   })
 
   it('shows a success alert when Gemini env configuration is detected', () => {
@@ -34,7 +39,9 @@ describe('GeminiChatPage', () => {
 
     render(<GeminiChatPage />)
 
-    expect(screen.getByRole('alert', { name: /gemini configured/i })).toBeInTheDocument()
+    // Ant Design Alert renders role="alert" with content in child nodes; check text content
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent(/gemini configured/i)
   })
 
   it('shows a warning alert when Gemini API key is not configured', () => {
@@ -42,14 +49,16 @@ describe('GeminiChatPage', () => {
 
     render(<GeminiChatPage />)
 
-    expect(screen.getByRole('alert', { name: /gemini api key not configured/i })).toBeInTheDocument()
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent(/gemini api key not configured/i)
   })
 
   it('disables Send when the draft is empty or whitespace-only', async () => {
     const user = userEvent.setup()
     render(<GeminiChatPage />)
 
-    const send = screen.getByRole('button', { name: /^send$/i })
+    // Ant Design Button with icon prefix: accessible name is "<icon-label><text>" e.g. "sendSend"
+    const send = screen.getByRole('button', { name: /send/i })
     expect(send).toBeDisabled()
 
     const input = screen.getByLabelText(/message input/i)
@@ -63,7 +72,7 @@ describe('GeminiChatPage', () => {
 
     const input = screen.getByLabelText(/message input/i)
     await user.type(input, '  Hello Gemini  ')
-    await user.click(screen.getByRole('button', { name: /^send$/i }))
+    await user.click(screen.getByRole('button', { name: /send/i }))
 
     const transcript = screen.getByLabelText(/chat transcript/i)
     expect(within(transcript).getByText('You')).toBeInTheDocument()
@@ -83,10 +92,15 @@ describe('GeminiChatPage', () => {
     render(<GeminiChatPage />)
 
     await user.type(screen.getByLabelText(/message input/i), 'Ping')
-    await user.click(screen.getByRole('button', { name: /^send$/i }))
+    await user.click(screen.getByRole('button', { name: /send/i }))
 
     await waitFor(() => {
-      expect(screen.getByRole('alert', { name: /request failed/i })).toHaveTextContent('Network is unreachable')
+      // Success alert + error alert are both rendered; find the error one by text
+      const errorAlert = screen
+        .getAllByRole('alert')
+        .find((el) => /request failed/i.test(el.textContent ?? ''))
+      expect(errorAlert).toBeTruthy()
+      expect(errorAlert).toHaveTextContent('Network is unreachable')
     })
   })
 
@@ -95,14 +109,15 @@ describe('GeminiChatPage', () => {
     render(<GeminiChatPage />)
 
     await user.type(screen.getByLabelText(/message input/i), 'Keep me')
-    await user.click(screen.getByRole('button', { name: /^send$/i }))
+    await user.click(screen.getByRole('button', { name: /send/i }))
     await waitFor(() => {
       expect(screen.getByText('Here is a concise reply.')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: /^clear$/i }))
+    // Ant Design Button with icon prefix: accessible name is "deleteClear"
+    await user.click(screen.getByRole('button', { name: /clear/i }))
 
-    expect(screen.getByText(/ask something like/i)).toBeInTheDocument()
+    expect(screen.getByText(/ask something about the portfolio/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/message input/i)).toHaveValue('')
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
   })
@@ -112,7 +127,6 @@ describe('GeminiChatPage', () => {
 
     render(<GeminiChatPage />)
 
-    expect(screen.getByText(/ask something like/i)).toBeInTheDocument()
+    expect(screen.getByText(/ask something about the portfolio/i)).toBeInTheDocument()
   })
 })
-

@@ -25,12 +25,8 @@
   line-height: 1.05 !important;
 }
 
-[data-theme='dark'] .accent {
+.accent {
   color: #a855f7;
-}
-
-[data-theme='light'] .accent {
-  color: #55f7e7;
 }
 
 .hero__desc {
@@ -60,20 +56,24 @@
 }
 
 
-[data-theme='dark'] .stats .ant-statistic-title {
+[data-theme='dark'] .stats,
+[data-theme='dark'] .ant-statistic-title {
   color: rgba(255, 255, 255, 0.55);
 }
 
-[data-theme='light'] .stats .ant-statistic-title {
+[data-theme='light'] .stats,
+[data-theme='light'] .ant-statistic-title {
   color: rgba(0, 0, 0, 0.55);
 }
 
 
-[data-theme='dark'] .stats .ant-statistic-content {
+[data-theme='dark'] .stats,
+[data-theme='dark'] .ant-statistic-content {
   color: rgba(255, 255, 255, 0.9);
 }
 
-[data-theme='light'] .stats .ant-statistic-content {
+[data-theme='light'] .stats,
+[data-theme='light'] .ant-statistic-content {
   color: rgba(0, 0, 0, 0.9);
 }
 
@@ -129,12 +129,14 @@
   font-weight: 600;
 }
 
-[data-theme='dark'] .portrait__badge-name {
-  color: rgba(255, 255, 255, 0.08);
+[data-theme='dark'] .portrait__badge-name,
+[data-theme='dark'] .portrait__badge-label  {
+  color: rgba(255, 255, 255, 1.08);
 }
 
-[data-theme='light'] .portrait__badge-name {
-  color: rgba(0, 0, 0, 0.08);
+[data-theme='light'] .portrait__badge-name,
+[data-theme='light'] .portrait__badge-label  {
+  color: rgba(255, 255, 255, 1.08);
 }
 
 .section {

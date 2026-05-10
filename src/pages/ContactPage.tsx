@@ -1,7 +1,8 @@
 import { EnvironmentOutlined, MailOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Form, Input, message, Row, Select, Space, Typography } from 'antd'
+import { App, Button, Card, Col, Form, Input, Row, Select, Space, Typography } from 'antd'
 import '../styles/contact.css'
 import emailjs from "@emailjs/browser";
+
 const { Title, Paragraph, Text } = Typography
 type ContactValues = {
   name: string
@@ -12,26 +13,38 @@ type ContactValues = {
 
 export default function ContactPage() {
   const [form] = Form.useForm<ContactValues>()
+  const { notification } = App.useApp()
 
-  const handleSubmit = async (values: ContactValues) => {
-    try {
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          name: values.name,
-          email: values.email,
-          subject: values.subject,
-          message: values.message,
-        },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      )
+const handleSubmit = async (values: ContactValues) => {
+  try {
+    await emailjs.send(
+      import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      {
+        name: values.name,
+        email: values.email,
+        subject: values.subject,
+        message: values.message,
+      },
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+    );
 
-      message.success('Message sent successfully!')
-      form.resetFields()
-    } catch (error) {
+    notification.success({
+      message: 'Message send',
+      description:'Your message has been sent successfully. Please checkout your email for a response.',
+      placement: 'topRight'
+    });
+
+    form.resetFields();
+  } catch (error) {
       console.error(error)
-      message.error('Failed to send message')
+
+      notification.error({
+      message: 'Failed to Send',
+      description: 'Something went wrong while sending your message. Please try again later.',
+      placement: 'topRight'
+    
+      });
     }
   }
 
@@ -57,8 +70,7 @@ export default function ContactPage() {
               <EnvironmentOutlined className="contact2-chip__icon" />
               <div>
                 <Text className="contact2-chip__label">CURRENT BASE</Text>
-                <Text className="contact2-chip__value">Yerevan, Armenia</Text>
-                <Text className="contact2-chip__hint">(GMT+4)</Text>
+                <Text className="contact2-chip__value">Yerevan, Armenia (GMT+4)</Text>
               </div>
             </div>
           </div>
@@ -130,4 +142,3 @@ export default function ContactPage() {
     </div>
   )
 }
-

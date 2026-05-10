@@ -19,3 +19,8 @@ body {
 .ant-menu-title-content {
   letter-spacing: 0.2px;
 }
+
+
+[data-theme='light'] .ant-input{
+  background: rgba(17, 24, 39, 0.04);
+}

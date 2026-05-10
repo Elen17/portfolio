@@ -17,43 +17,71 @@ const { Title, Paragraph, Text } = Typography
 type MasteryItem = { label: string; percent: number; details: string }
 
 const CORE_MASTERY: MasteryItem[] = [
-  { label: 'Angular', percent: 93, details: 'SPA, Standalone, RxJS, Signals, Architecture' },
-  { label: 'Spring Boot', percent: 91, details: 'REST, Security, Data, Validation, Observability' },
+  {
+    label: 'Angular',
+    percent: 93,
+    details: 'Enterprise SPAs, RxJS, Signals, state management, scalable frontend architecture',
+  },
+  {
+    label: 'Spring Boot',
+    percent: 91,
+    details: 'REST APIs, security, integrations, validation, observability, backend architecture',
+  },
 ]
 
 const MICRO_CARDS = [
-  { title: 'Java', subtitle: 'Backend programming, concurrency, runtime patterns', icon: <SafetyCertificateOutlined /> },
-  { title: 'TypeScript', subtitle: 'Typed UI, tooling, systems, interface design', icon: <CodeOutlined /> },
+  {
+    title: 'Java',
+    subtitle: 'Backend engineering, concurrency, scalable service development',
+    icon: <SafetyCertificateOutlined />,
+  },
+  {
+    title: 'TypeScript',
+    subtitle: 'Strong typing, maintainable frontend systems, application architecture',
+    icon: <CodeOutlined />,
+  },
 ]
 
 const FEATURE_CARDS = [
   {
-    title: 'Full-stack Development',
-    subtitle: 'Front-to-end delivery with clean boundaries',
+    title: 'Full-Stack Development',
+    subtitle: 'Building scalable applications across frontend and backend',
     icon: <DeploymentUnitOutlined />,
-    tags: ['Interfaces', 'APIs', 'Testing'],
-    desc: 'From polished interfaces to robust domain services and integrations.',
+    tags: ['Angular', 'Spring Boot', 'Testing'],
+    desc: 'Developing enterprise-grade applications with clean architecture, maintainable codebases, and reliable integrations.',
   },
   {
-    title: 'API Architecture',
-    subtitle: 'Secure, observable, resilient services',
+    title: 'API & Backend Architecture',
+    subtitle: 'Reliable, secure, and maintainable service design',
     icon: <ApiOutlined />,
-    tags: ['Spring', 'REST', 'Auth'],
-    desc: 'Designing APIs that stay predictable under growth and change.',
+    tags: ['REST', 'Security', 'Integrations'],
+    desc: 'Designing backend systems and APIs focused on scalability, resilience, and long-term maintainability.',
   },
   {
-    title: 'Infrastructure',
-    subtitle: 'CI-friendly, deployable workflows',
+    title: 'Infrastructure & Delivery',
+    subtitle: 'Deployment pipelines and production-ready workflows',
     icon: <ContainerOutlined />,
     tags: ['Docker', 'CI/CD', 'AWS'],
-    desc: 'Automation, containerization, and repeatable pipelines for shipping.',
+    desc: 'Containerization, deployment automation, and development workflows that support reliable delivery.',
   },
 ]
 
 const FORGE = [
-  { title: 'VS Code', subtitle: 'Fast edits, strong navigation, and extension workflows', icon: <LaptopOutlined /> },
-  { title: 'Figma', subtitle: 'Design systems and UI collaboration hand-offs', icon: <BranchesOutlined /> },
-  { title: 'Git Version Control', subtitle: 'Readable history, clean reviews, confident releases', icon: <GithubOutlined /> },
+  {
+    title: 'VS Code',
+    subtitle: 'Efficient development workflows, debugging and productivity',
+    icon: <LaptopOutlined />,
+  },
+  {
+    title: 'Figma',
+    subtitle: 'UI collaboration, interface prototyping, and design system alignment',
+    icon: <BranchesOutlined />,
+  },
+  {
+    title: 'Git & Version Control',
+    subtitle: 'Collaborative development, code reviews, and structured release workflows',
+    icon: <GithubOutlined />,
+  },
 ]
 
 export default function SkillsPage() {
@@ -64,18 +92,20 @@ export default function SkillsPage() {
       <section className="skills2-hero">
         <Row gutter={[24, 24]} align="top">
           <Col xs={24} lg={12}>
-            <Text className="skills2-eyebrow">COMPUTATION MANUAL</Text>
+            <Text className="skills2-eyebrow">
+              TECHNICAL EXPERTISE
+            </Text>
             <Title className="skills2-title">
-              Technical <span className="skills2-title__accent">Arsenal</span>
+              Engineering <span className="skills2-title__accent">Capabilities</span>
             </Title>
             <Paragraph className="skills2-desc">
-              A curated collection of technologies, architectural patterns, and creative tools I leverage to build
-              high-performance, expressive-grade digital experiences.
+              A focused set of technologies, architectural practices, and engineering
+              tools used to design scalable backend systems, enterprise applications,
+              and modern frontend experiences.
             </Paragraph>
-
             <div className="skills2-section">
               <Title level={4} className="skills2-section__title">
-                Core Mastery
+                Core Technologies
               </Title>
 
               <div className="skills2-mastery">
@@ -144,7 +174,7 @@ export default function SkillsPage() {
 
       <section className="skills2-section">
         <Title level={4} className="skills2-section__title">
-          The Forge
+          Development Environment
         </Title>
 
         <Row gutter={[16, 16]}>
@@ -169,14 +199,16 @@ export default function SkillsPage() {
       <section className="skills2-cta" aria-label="Skills call to action">
         <div className="skills2-cta__inner">
           <Title level={3} className="skills2-cta__title">
-            Need a specialized technical lead?
+            Building scalable products with strong engineering foundations
           </Title>
+
           <Paragraph className="skills2-cta__desc">
-            I’m currently open to collaborative projects and high-impact full-stack roles where technical excellence
-            meets artistic vision.
+            Open to backend, full-stack, and architecture-focused opportunities where
+            clean system design, reliability, and maintainability are valued.
           </Paragraph>
+
           <Button type="primary" onClick={() => navigate('/contact')}>
-            Initiate Discussion
+            Let’s Connect
           </Button>
         </div>
       </section>
