@@ -2,8 +2,10 @@ import { DeleteOutlined, SendOutlined } from '@ant-design/icons'
 import { Alert, Button, Card, Input, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { generateGeminiReply, isGeminiConfigured, type ChatMessage } from '../api/gemini'
+import { createTalk, isDidConfigured, pollTalkUntilTerminal } from '../api/did'
 import '../styles/gemini-chat.css'
 import cvMarkdown from '../../cv.md?raw'
+import avatarImg from '../assets/avatar.png'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -22,6 +24,8 @@ const SUGGESTIONS = [
   'How do you approach system design?',
 ]
 
+type DidPhase = 'idle' | 'script' | 'talk' | 'polling' | 'done' | 'error'
+
 export default function GeminiChatPage() {
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
@@ -37,8 +41,18 @@ export default function GeminiChatPage() {
     }
   })
 
+  const [didPhase, setDidPhase] = useState<DidPhase>('idle')
+  const [didVideo, setDidVideo] = useState<string | null>(null)
+  const [didErr, setDidErr] = useState<string | null>(null)
+
   const configured = isGeminiConfigured()
+  const didConfigured = isDidConfigured()
+  const didSourceUrl = (import.meta.env.VITE_DID_SOURCE_URL as string | undefined)?.trim()
+  const didReady = didConfigured && Boolean(didSourceUrl)
+  const didBusy = didPhase === 'script' || didPhase === 'talk' || didPhase === 'polling'
+
   const abortRef = useRef<AbortController | null>(null)
+  const didAbortRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -56,6 +70,7 @@ export default function GeminiChatPage() {
   useEffect(() => {
     return () => {
       abortRef.current?.abort()
+      didAbortRef.current?.abort()
     }
   }, [])
 
@@ -94,6 +109,53 @@ export default function GeminiChatPage() {
     } finally {
       setBusy(false)
     }
+  }
+
+  const generateDidIntro = async () => {
+    setDidPhase('script')
+    setDidErr(null)
+    setDidVideo(null)
+    didAbortRef.current?.abort()
+    didAbortRef.current = new AbortController()
+    const signal = didAbortRef.current.signal
+
+    try {
+      const script = await generateGeminiReply({
+        messages: [
+          {
+            id: createId(),
+            role: 'user',
+            text: "Write a 2–3 sentence spoken introduction for Elen Khachatryan's portfolio website. First person, professional, conversational. Plain text only — no markdown, no lists. Under 45 words.",
+          },
+        ],
+        cvMarkdown,
+        signal,
+      })
+
+      setDidPhase('talk')
+      const talk = await createTalk({ sourceUrl: didSourceUrl!, text: script, signal })
+
+      setDidPhase('polling')
+      const result = await pollTalkUntilTerminal({ id: talk.id, signal })
+
+      if (result.status === 'done' && result.result_url) {
+        setDidVideo(result.result_url)
+        setDidPhase('done')
+      } else {
+        throw new Error(`D-ID talk ended with status "${result.status}".`)
+      }
+    } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') { setDidPhase('idle'); return }
+      setDidErr(e instanceof Error ? e.message : 'D-ID generation failed.')
+      setDidPhase('error')
+    }
+  }
+
+  const resetDid = () => {
+    didAbortRef.current?.abort()
+    setDidPhase('idle')
+    setDidVideo(null)
+    setDidErr(null)
   }
 
   const send = () => sendText(draft)
@@ -160,6 +222,66 @@ export default function GeminiChatPage() {
           onClose={() => setError(null)}
         />
       )}
+
+      <Card className="gchat-card">
+        <div className="gchat-did">
+          <div className="gchat-did-media">
+            {didPhase === 'done' && didVideo ? (
+              <video className="gchat-did-video" src={didVideo} controls autoPlay playsInline />
+            ) : (
+              <img className="gchat-did-img" src={avatarImg} alt="Elen Khachatryan" />
+            )}
+          </div>
+          <div className="gchat-did-content">
+            <Text className="gchat-eyebrow">D-ID AVATAR</Text>
+            <Title level={5} className="gchat-did-title">AI Introduction</Title>
+            <Paragraph className="gchat-did-body">
+              Generates a spoken intro using Gemini + D-ID — Elen's portrait brought to life.
+            </Paragraph>
+
+            {!didReady && (
+              <Alert
+                type="warning"
+                showIcon
+                message="D-ID not configured"
+                description={
+                  <Text>
+                    Add <Text code>VITE_DID_API_KEY</Text> and <Text code>VITE_DID_SOURCE_URL</Text> to{' '}
+                    <Text code>.env.local</Text>
+                  </Text>
+                }
+              />
+            )}
+
+            {didErr && (
+              <Alert type="error" showIcon message={didErr} closable onClose={resetDid} />
+            )}
+
+            {didBusy && (
+              <Text type="secondary" className="gchat-did-status">
+                {didPhase === 'script' && 'Writing script with Gemini…'}
+                {didPhase === 'talk' && 'Sending to D-ID…'}
+                {didPhase === 'polling' && 'Rendering avatar video…'}
+              </Text>
+            )}
+
+            <div className="gchat-did-actions">
+              {didPhase === 'done' ? (
+                <Button onClick={resetDid}>Regenerate</Button>
+              ) : (
+                <Button
+                  type="primary"
+                  loading={didBusy}
+                  disabled={!didReady || didBusy}
+                  onClick={() => void generateDidIntro()}
+                >
+                  Generate Introduction
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="gchat-card">
         <div className="gchat-thread" ref={scrollRef} aria-label="Chat transcript">

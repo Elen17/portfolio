@@ -239,6 +239,61 @@
   gap: 6px;
 }
 
+/* --- D-ID avatar panel --- */
+
+.gchat-did {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.gchat-did-media {
+  flex-shrink: 0;
+}
+
+.gchat-did-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(168, 85, 247, 0.4);
+  display: block;
+}
+
+.gchat-did-video {
+  width: 180px;
+  border-radius: 14px;
+  border: 2px solid rgba(168, 85, 247, 0.4);
+  display: block;
+}
+
+.gchat-did-content {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.gchat-did-title {
+  margin: 0 !important;
+}
+
+.gchat-did-body {
+  margin: 0 !important;
+  font-size: 0.88rem;
+}
+
+.gchat-did-status {
+  font-size: 12px;
+}
+
+.gchat-did-actions {
+  display: flex;
+  gap: 8px;
+}
+
 /* --- Theme-scoped colours --- */
 
 [data-theme='dark'] .gchat-eyebrow,
