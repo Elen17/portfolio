@@ -1,28 +1,17 @@
 import { DeleteOutlined, SendOutlined } from '@ant-design/icons'
 import { Alert, Button, Card, Input, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
-import { generateGeminiReply, isGeminiConfigured, type ChatMessage } from '../api/gemini'
-import { createTalk, isDidConfigured, pollTalkUntilTerminal } from '../api/did'
-import '../styles/gemini-chat.css'
-import cvMarkdown from '../../cv.md?raw'
-import avatarImg from '../assets/avatar.png'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { generateGeminiReply, isGeminiConfigured, type ChatMessage } from '../../api/gemini'
+import { createTalk, isDidConfigured, pollTalkUntilTerminal } from '../../api/did'
+import avatarImg from '../../assets/avatar.png'
+import cvMarkdown from '../../../cv.md?raw'
+import { DID_INTRO_PROMPT, STORAGE_KEY, SUGGESTIONS } from './consts'
+import { createId, loadStoredMessages } from './utils'
+import './styles.css'
 
 const { Title, Text, Paragraph } = Typography
-
-function createId() {
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`
-}
-
-const STORAGE_KEY = 'portfolio.geminiChat.v1'
-
-const SUGGESTIONS = [
-  'What technologies do you specialize in?',
-  'Tell me about your most recent project.',
-  "What's your experience with backend systems?",
-  'How do you approach system design?',
-]
 
 type DidPhase = 'idle' | 'script' | 'talk' | 'polling' | 'done' | 'error'
 
@@ -30,25 +19,15 @@ export default function GeminiChatPage() {
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (!raw) return []
-      const parsed = JSON.parse(raw) as ChatMessage[]
-      return Array.isArray(parsed) ? parsed : []
-    } catch {
-      return []
-    }
-  })
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadStoredMessages(STORAGE_KEY))
 
   const [didPhase, setDidPhase] = useState<DidPhase>('idle')
   const [didVideo, setDidVideo] = useState<string | null>(null)
   const [didErr, setDidErr] = useState<string | null>(null)
 
   const configured = isGeminiConfigured()
-  const didConfigured = isDidConfigured()
-  const didSourceUrl = (import.meta.env.VITE_DID_SOURCE_URL as string | undefined)?.trim()
-  const didReady = didConfigured && Boolean(didSourceUrl)
+  const didSourceUrl = import.meta.env.VITE_DID_SOURCE_URL?.trim()
+  const didReady = isDidConfigured() && Boolean(didSourceUrl)
   const didBusy = didPhase === 'script' || didPhase === 'talk' || didPhase === 'polling'
 
   const abortRef = useRef<AbortController | null>(null)
@@ -112,6 +91,11 @@ export default function GeminiChatPage() {
   }
 
   const generateDidIntro = async () => {
+    if (!didSourceUrl) {
+      setDidErr('VITE_DID_SOURCE_URL is not set.')
+      setDidPhase('error')
+      return
+    }
     setDidPhase('script')
     setDidErr(null)
     setDidVideo(null)
@@ -121,19 +105,13 @@ export default function GeminiChatPage() {
 
     try {
       const script = await generateGeminiReply({
-        messages: [
-          {
-            id: createId(),
-            role: 'user',
-            text: "Write a 2–3 sentence spoken introduction for Elen Khachatryan's portfolio website. First person, professional, conversational. Plain text only — no markdown, no lists. Under 45 words.",
-          },
-        ],
+        messages: [{ id: createId(), role: 'user', text: DID_INTRO_PROMPT }],
         cvMarkdown,
         signal,
       })
 
       setDidPhase('talk')
-      const talk = await createTalk({ sourceUrl: didSourceUrl!, text: script, signal })
+      const talk = await createTalk({ sourceUrl: didSourceUrl, text: script, signal })
 
       setDidPhase('polling')
       const result = await pollTalkUntilTerminal({ id: talk.id, signal })
@@ -233,10 +211,9 @@ export default function GeminiChatPage() {
             )}
           </div>
           <div className="gchat-did-content">
-            <Text className="gchat-eyebrow">D-ID AVATAR</Text>
             <Title level={5} className="gchat-did-title">AI Introduction</Title>
             <Paragraph className="gchat-did-body">
-              Generates a spoken intro using Gemini + D-ID — Elen's portrait brought to life.
+              CV Intro
             </Paragraph>
 
             {!didReady && (
@@ -247,7 +224,7 @@ export default function GeminiChatPage() {
                 description={
                   <Text>
                     Add <Text code>VITE_DID_API_KEY</Text> and <Text code>VITE_DID_SOURCE_URL</Text> to{' '}
-                    <Text code>.env.local</Text>
+                    <Text code>.env.local</Text>.
                   </Text>
                 }
               />

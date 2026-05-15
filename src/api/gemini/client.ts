@@ -1,38 +1,23 @@
-import axios from 'axios'
+import { GoogleGenAI, type Content } from '@google/genai'
 import type { ChatMessage } from './types'
 
-type GeminiPart = { text: string }
-type GeminiContent = { role?: 'user' | 'model'; parts: GeminiPart[] }
-
-type GeminiGenerateResponse = {
-  candidates?: Array<{
-    content?: { parts?: Array<{ text?: string }> }
-  }>
-  error?: { message?: string }
-}
-
-const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta'
 const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash'
 
 function getApiKey() {
-  const key = import.meta.env.VITE_GEMINI_API_KEY as string | undefined
-  return key?.trim() ? key.trim() : undefined
+  const key = import.meta.env.VITE_GEMINI_API_KEY?.trim()
+  return key ? key : undefined
 }
 
 function getModelId() {
-  const fromEnv = import.meta.env.VITE_GEMINI_MODEL as string | undefined
-  return fromEnv?.trim() || DEFAULT_GEMINI_MODEL
+  return import.meta.env.VITE_GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL
 }
 
 export function isGeminiConfigured() {
   return Boolean(getApiKey())
 }
 
-function buildSystemInstruction(cv: string): GeminiContent {
-  return {
-    parts: [
-      {
-        text: `You are acting as Elen Khachatryan, a full-stack software engineer.
+function buildSystemInstruction(cv: string): string {
+  return `You are acting as Elen Khachatryan, a full-stack software engineer.
 
 Your purpose is to answer portfolio visitors exactly as Elen would during a professional engineering conversation.
 This is an ongoing conversation with a portfolio visitor. Maintain consistency in tone and personality across all turns.
@@ -77,50 +62,32 @@ Portfolio CV context:
 
 <<<CV_START>>>
 ${cv}
-<<<CV_END>>>`,
-      },
-    ],
-  }
+<<<CV_END>>>`
 }
 
-async function* readSSEStream(response: Response): AsyncGenerator<GeminiGenerateResponse> {
-  const reader = response.body!.getReader()
-  const decoder = new TextDecoder()
-  let buffer = ''
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      buffer += decoder.decode(value, { stream: true })
-
-      const lines = buffer.split('\n')
-      buffer = lines.pop() ?? ''
-
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue
-        const json = line.slice(6).trim()
-        if (!json || json === '[DONE]') continue
-        try {
-          yield JSON.parse(json) as GeminiGenerateResponse
-        } catch {
-          // skip malformed chunk
-        }
-      }
-    }
-  } finally {
-    reader.releaseLock()
-  }
-}
-
-export async function generateGeminiReply(args: {
+export type GenerateGeminiReplyArgs = {
   messages: ChatMessage[]
   cvMarkdown: string
   signal?: AbortSignal
   onChunk?: (partialText: string) => void
-}): Promise<string> {
-  const key = getApiKey()
-  if (!key) {
+}
+
+function describeError(e: unknown): string {
+  const base = e instanceof Error ? e.message : 'Gemini request failed.'
+  const cause = e instanceof Error && 'cause' in e ? (e as { cause?: unknown }).cause : undefined
+  if (cause instanceof Error) return `${base} (${cause.name}: ${cause.message})`
+  return base
+}
+
+function extractText(response: { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> }): string {
+  return response.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? ''
+}
+
+const NO_OUTPUT = 'I did not receive any text output. Try asking again with a bit more detail.'
+
+export async function generateGeminiReply(args: GenerateGeminiReplyArgs): Promise<string> {
+  const apiKey = getApiKey()
+  if (!apiKey) {
     throw new Error('Missing VITE_GEMINI_API_KEY. Add it to your .env.local and restart the dev server.')
   }
 
@@ -129,107 +96,51 @@ export async function generateGeminiReply(args: {
     throw new Error('Your cv.md is empty. Add your CV content to cv.md and refresh.')
   }
 
-  const modelId = getModelId()
-  const contents: GeminiContent[] = args.messages.map((m) => ({
+  const ai = new GoogleGenAI({ apiKey })
+  const model = getModelId()
+  const contents: Content[] = args.messages.map((m) => ({
     role: m.role,
     parts: [{ text: m.text }],
   }))
-
-  const body = {
+  const config = {
     systemInstruction: buildSystemInstruction(cv),
-    contents,
-    generationConfig: {
-      temperature: 0.55,
-      topP: 0.9,
-      maxOutputTokens: 1200,
-    },
+    temperature: 0.55,
+    topP: 0.9,
+    maxOutputTokens: 1200,
   }
 
   if (args.onChunk) {
-    const url = `${GEMINI_BASE_URL}/models/${modelId}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`
-    let response: Response
+    let iterator: AsyncIterable<unknown>
     try {
-      response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: args.signal,
-      })
+      iterator = await ai.models.generateContentStream({ model, contents, config })
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') throw e
-      throw new Error(e instanceof Error ? e.message : 'Gemini request failed.')
-    }
-
-    if (!response.ok) {
-      let message = `HTTP ${response.status}`
-      try {
-        const err = (await response.json()) as { error?: { message?: string } }
-        message = err.error?.message || message
-      } catch {
-        // ignore parse failure
-      }
-      throw new Error(message)
+      throw new Error(describeError(e))
     }
 
     let fullText = ''
-    for await (const chunk of readSSEStream(response)) {
-      const chunkText =
-        chunk.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? ''
-      if (chunkText) {
-        fullText += chunkText
-        args.onChunk(fullText)
+    try {
+      for await (const chunk of iterator) {
+        const chunkText = extractText(chunk as Parameters<typeof extractText>[0])
+        if (chunkText) {
+          fullText += chunkText
+          args.onChunk(fullText)
+        }
+        if (args.signal?.aborted) throw new DOMException('Aborted', 'AbortError')
       }
+    } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') throw e
+      throw new Error(describeError(e))
     }
 
-    return fullText.trim() || 'I did not receive any text output. Try asking again with a bit more detail.'
+    return fullText.trim() || NO_OUTPUT
   }
 
-  // Non-streaming fallback
-  const url = `${GEMINI_BASE_URL}/models/${modelId}:generateContent`
   try {
-    const res = await axios.post<GeminiGenerateResponse>(url, body, {
-      params: { key },
-      signal: args.signal,
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const text =
-      res.data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? ''
-    return text.trim() || 'I did not receive any text output. Try asking again with a bit more detail.'
+    const response = await ai.models.generateContent({ model, contents, config })
+    return extractText(response).trim() || NO_OUTPUT
   } catch (e) {
-    if (axios.isAxiosError(e)) {
-      const message = e.response?.data?.error?.message || e.message || 'Gemini request failed.'
-      throw new Error(message)
-    }
-    throw e
-  }
-}
-
-type GeminiModel = {
-  name?: string
-  displayName?: string
-  supportedGenerationMethods?: string[]
-}
-
-type GeminiListModelsResponse = {
-  models?: GeminiModel[]
-  error?: { message?: string }
-}
-
-export async function listGeminiModels(args?: { signal?: AbortSignal }) {
-  const key = getApiKey()
-  if (!key) {
-    throw new Error('Missing VITE_GEMINI_API_KEY. Add it to your .env.local and restart the dev server.')
-  }
-
-  const url = `${GEMINI_BASE_URL}/models`
-  try {
-    const res = await axios.get<GeminiListModelsResponse>(url, { params: { key }, signal: args?.signal })
-    return res.data.models ?? []
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      const message = e.response?.data?.error?.message || e.message || 'ListModels failed.'
-      throw new Error(message)
-    }
-    throw e
+    if (e instanceof Error && e.name === 'AbortError') throw e
+    throw new Error(describeError(e))
   }
 }

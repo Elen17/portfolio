@@ -1,50 +1,40 @@
 import { EnvironmentOutlined, MailOutlined } from '@ant-design/icons'
 import { App, Button, Card, Col, Form, Input, Row, Select, Space, Typography } from 'antd'
-import '../styles/contact.css'
-import emailjs from "@emailjs/browser";
+import { useState } from 'react'
+import { sendContactMessage, type ContactMessage } from '../../api/emailjs'
+import { SUBJECT_OPTIONS } from './consts'
+import './styles.css'
 
 const { Title, Paragraph, Text } = Typography
-type ContactValues = {
-  name: string
-  email: string
-  subject: string
-  message: string
-}
+
+type ContactValues = ContactMessage
 
 export default function ContactPage() {
   const [form] = Form.useForm<ContactValues>()
   const { notification } = App.useApp()
+  const [submitting, setSubmitting] = useState(false)
 
-const handleSubmit = async (values: ContactValues) => {
-  try {
-    await emailjs.send(
-      import.meta.env.VITE_EMAILJS_SERVICE_ID,
-      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-      {
-        name: values.name,
-        email: values.email,
-        subject: values.subject,
-        message: values.message,
-      },
-      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-    );
+  const handleSubmit = async (values: ContactValues) => {
+    setSubmitting(true)
+    try {
+      await sendContactMessage(values)
 
-    notification.success({
-      message: 'Message send',
-      description:'Your message has been sent successfully. Please checkout your email for a response.',
-      placement: 'topRight'
-    });
+      notification.success({
+        message: 'Message sent',
+        description: 'Your message has been sent successfully. Please check your email for a response.',
+        placement: 'topRight',
+      })
 
-    form.resetFields();
-  } catch (error) {
+      form.resetFields()
+    } catch (error) {
       console.error(error)
-
       notification.error({
-      message: 'Failed to Send',
-      description: 'Something went wrong while sending your message. Please try again later.',
-      placement: 'topRight'
-    
-      });
+        message: 'Failed to send',
+        description: 'Something went wrong while sending your message. Please try again later.',
+        placement: 'topRight',
+      })
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -83,7 +73,9 @@ const handleSubmit = async (values: ContactValues) => {
               form={form}
               layout="vertical"
               requiredMark={false}
-              onFinish={handleSubmit}>
+              onFinish={handleSubmit}
+              disabled={submitting}
+            >
               <Form.Item<ContactValues>
                 label="Your name"
                 name="name"
@@ -103,15 +95,8 @@ const handleSubmit = async (values: ContactValues) => {
                 <Input placeholder="john.doe@gmail.com" />
               </Form.Item>
 
-              <Form.Item<ContactValues> label="Subject" name="subject" initialValue="Architectural Inquiry">
-                <Select
-                  options={[
-                    { value: 'Architectural Inquiry', label: 'Architectural Inquiry' },
-                    { value: 'Full-stack Delivery', label: 'Full-stack Delivery' },
-                    { value: 'Design System', label: 'Design System' },
-                    { value: 'Consulting', label: 'Consulting' },
-                  ]}
-                />
+              <Form.Item<ContactValues> label="Subject" name="subject" initialValue={SUBJECT_OPTIONS[0].value}>
+                <Select options={[...SUBJECT_OPTIONS]} />
               </Form.Item>
 
               <Form.Item<ContactValues>
@@ -123,15 +108,16 @@ const handleSubmit = async (values: ContactValues) => {
               </Form.Item>
 
               <Space wrap>
-                <Button type="primary" htmlType="submit" className="contact2-submit" icon={<MailOutlined />}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className="contact2-submit"
+                  icon={<MailOutlined />}
+                  loading={submitting}
+                >
                   Dispatch Message
                 </Button>
-                <Button
-                  htmlType="button"
-                  onClick={() => {
-                    form.resetFields()
-                  }}
-                >
+                <Button htmlType="button" onClick={() => form.resetFields()}>
                   Reset
                 </Button>
               </Space>

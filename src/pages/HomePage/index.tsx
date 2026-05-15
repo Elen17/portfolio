@@ -1,15 +1,16 @@
 import { DownloadOutlined, GithubOutlined, LinkedinOutlined, MailOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Divider, Row, Space, Statistic, Typography } from 'antd'
-import avatarUrl from '../assets/avatar.png'
-import '../styles/home.css'
 import { useNavigate } from 'react-router-dom'
-import { ExternalService, openExternalURL } from '../utils/utlis'
+import avatarUrl from '../../assets/avatar.png'
+import { ExternalService, openExternalURL } from '../../utils/utils'
+import { CAREER_START_YEAR } from './consts'
+import './styles.css'
 
 const { Title, Text, Paragraph } = Typography
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const yearsOfExperience = new Date().getFullYear() - 2021;
+  const yearsOfExperience = new Date().getFullYear() - CAREER_START_YEAR
 
   return (
     <>

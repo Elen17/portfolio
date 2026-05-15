@@ -9,8 +9,8 @@ on:
       - 'release/**'
 
 jobs:
-  test:
-    name: Run Vitest Tests
+  ci:
+    name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
 
     steps:
@@ -31,5 +31,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
         run: pnpm test
+
+      - name: Build
+        run: pnpm build

@@ -1,19 +1,13 @@
 import { CheckCircleFilled, DownloadOutlined, MailOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Space, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import hallwayUrl from '../assets/cover-hallway.jpg'
-import circuitUrl from '../assets/cover-circuit.png'
-import '../styles/cover.css'
-import { ExternalService, openExternalURL } from '../utils/utlis'
+import hallwayUrl from '../../assets/cover-hallway.jpg'
+import circuitUrl from '../../assets/cover-circuit.png'
+import { ExternalService, openExternalURL } from '../../utils/utils'
+import { PRINCIPLES } from './consts'
+import './styles.css'
 
 const { Title, Paragraph, Text } = Typography
-
-const PRINCIPLES = [
-  { title: 'Performance', subtitle: 'OPTIMIZED ARTIFACTS' },
-  { title: 'Security', subtitle: 'FORTIFIED INTEGRITY' },
-  { title: 'Accessibility', subtitle: 'UNIVERSAL CLARITY' },
-  { title: 'Stability', subtitle: 'RESILIENT CORE' },
-]
 
 export default function CoverPage() {
   const navigate = useNavigate();

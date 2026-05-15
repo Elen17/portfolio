@@ -77,6 +77,6 @@
   padding: 0 20px;
 }
 
-.switch-item {
-  margin-top: 22px;
+.theme-switch {
+  flex-shrink: 0;
 }

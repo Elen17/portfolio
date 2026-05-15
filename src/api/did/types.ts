@@ -10,6 +10,11 @@ export type CreateTalkRequest = {
   script: TalkScript
 }
 
+export type TalkError = {
+  kind?: string
+  description?: string
+}
+
 export type TalkResponse = {
   id: string
   status: TalkStatus
@@ -17,4 +22,5 @@ export type TalkResponse = {
   created_by?: string
   object?: string
   result_url?: string
+  error?: TalkError
 }

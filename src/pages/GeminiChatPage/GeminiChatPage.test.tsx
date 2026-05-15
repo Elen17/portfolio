@@ -1,26 +1,37 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import GeminiChatPage from './GeminiChatPage'
+import GeminiChatPage from './index'
+import type { GenerateGeminiReplyArgs } from '../../api/gemini'
+import { STORAGE_KEY } from './consts'
 
-const STORAGE_KEY = 'portfolio.geminiChat.v1'
-
-const { mockGenerateGeminiReply, mockIsGeminiConfigured } = vi.hoisted(() => ({
+const { mockGenerateGeminiReply, mockIsGeminiConfigured, mockIsDidConfigured } = vi.hoisted(() => ({
   mockGenerateGeminiReply: vi.fn(),
   mockIsGeminiConfigured: vi.fn(),
+  mockIsDidConfigured: vi.fn(),
 }))
 
-vi.mock('../api/gemini', () => ({
-  generateGeminiReply: (...args) => mockGenerateGeminiReply(...args),
+vi.mock('../../api/gemini', () => ({
+  generateGeminiReply: (args: GenerateGeminiReplyArgs) => mockGenerateGeminiReply(args),
   isGeminiConfigured: () => mockIsGeminiConfigured(),
 }))
+
+vi.mock('../../api/did', () => ({
+  isDidConfigured: () => mockIsDidConfigured(),
+  createTalk: vi.fn(),
+  getTalk: vi.fn(),
+  pollTalkUntilTerminal: vi.fn(),
+}))
+
+const findAlert = (matcher: RegExp) =>
+  screen.getAllByRole('alert').find((el) => matcher.test(el.textContent ?? ''))
 
 describe('GeminiChatPage', () => {
   beforeEach(() => {
     localStorage.clear()
     vi.clearAllMocks()
     mockIsGeminiConfigured.mockReturnValue(true)
-    // Simulate streaming: call onChunk with the reply text, then resolve
-    mockGenerateGeminiReply.mockImplementation(async ({ onChunk }) => {
+    mockIsDidConfigured.mockReturnValue(false)
+    mockGenerateGeminiReply.mockImplementation(async ({ onChunk }: GenerateGeminiReplyArgs) => {
       const reply = 'Here is a concise reply.'
       onChunk?.(reply)
       return reply
@@ -39,9 +50,7 @@ describe('GeminiChatPage', () => {
 
     render(<GeminiChatPage />)
 
-    // Ant Design Alert renders role="alert" with content in child nodes; check text content
-    const alert = screen.getByRole('alert')
-    expect(alert).toHaveTextContent(/gemini configured/i)
+    expect(findAlert(/gemini configured/i)).toBeTruthy()
   })
 
   it('shows a warning alert when Gemini API key is not configured', () => {
@@ -49,15 +58,13 @@ describe('GeminiChatPage', () => {
 
     render(<GeminiChatPage />)
 
-    const alert = screen.getByRole('alert')
-    expect(alert).toHaveTextContent(/gemini api key not configured/i)
+    expect(findAlert(/gemini api key not configured/i)).toBeTruthy()
   })
 
   it('disables Send when the draft is empty or whitespace-only', async () => {
     const user = userEvent.setup()
     render(<GeminiChatPage />)
 
-    // Ant Design Button with icon prefix: accessible name is "<icon-label><text>" e.g. "sendSend"
     const send = screen.getByRole('button', { name: /send/i })
     expect(send).toBeDisabled()
 
@@ -95,10 +102,7 @@ describe('GeminiChatPage', () => {
     await user.click(screen.getByRole('button', { name: /send/i }))
 
     await waitFor(() => {
-      // Success alert + error alert are both rendered; find the error one by text
-      const errorAlert = screen
-        .getAllByRole('alert')
-        .find((el) => /request failed/i.test(el.textContent ?? ''))
+      const errorAlert = findAlert(/request failed/i)
       expect(errorAlert).toBeTruthy()
       expect(errorAlert).toHaveTextContent('Network is unreachable')
     })
@@ -114,7 +118,6 @@ describe('GeminiChatPage', () => {
       expect(screen.getByText('Here is a concise reply.')).toBeInTheDocument()
     })
 
-    // Ant Design Button with icon prefix: accessible name is "deleteClear"
     await user.click(screen.getByRole('button', { name: /clear/i }))
 
     expect(screen.getByText(/ask something about the portfolio/i)).toBeInTheDocument()
