@@ -13,6 +13,11 @@ export function isDidConfigured() {
   return Boolean(getApiKey())
 }
 
+export function getDidSourceUrl(): string | undefined {
+  const url = import.meta.env.VITE_DID_SOURCE_URL?.trim()
+  return url ? url : undefined
+}
+
 function authHeader(): string {
   const key = getApiKey()
   if (!key) throw new Error('Missing VITE_DID_API_KEY. Add it to your .env.local and restart the dev server.')

@@ -4,23 +4,30 @@ import GeminiChatPage from './index'
 import type { GenerateGeminiReplyArgs } from '../../api/gemini'
 import { STORAGE_KEY } from './consts'
 
-const { mockGenerateGeminiReply, mockIsGeminiConfigured, mockIsDidConfigured } = vi.hoisted(() => ({
-  mockGenerateGeminiReply: vi.fn(),
-  mockIsGeminiConfigured: vi.fn(),
-  mockIsDidConfigured: vi.fn(),
-}))
+const mockGenerateGeminiReply = jest.fn()
+const mockIsGeminiConfigured = jest.fn()
+const mockIsDidConfigured = jest.fn()
+const mockGetDidSourceUrl = jest.fn()
 
-vi.mock('../../api/gemini', () => ({
+jest.mock('../../api/gemini', () => ({
   generateGeminiReply: (args: GenerateGeminiReplyArgs) => mockGenerateGeminiReply(args),
   isGeminiConfigured: () => mockIsGeminiConfigured(),
 }))
 
-vi.mock('../../api/did', () => ({
+jest.mock('../../api/did', () => ({
   isDidConfigured: () => mockIsDidConfigured(),
-  createTalk: vi.fn(),
-  getTalk: vi.fn(),
-  pollTalkUntilTerminal: vi.fn(),
+  getDidSourceUrl: () => mockGetDidSourceUrl(),
+  createTalk: jest.fn(),
+  getTalk: jest.fn(),
+  pollTalkUntilTerminal: jest.fn(),
 }))
+
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+}))
+
+jest.mock('remark-gfm', () => ({ __esModule: true, default: () => () => {} }))
 
 const findAlert = (matcher: RegExp) =>
   screen.getAllByRole('alert').find((el) => matcher.test(el.textContent ?? ''))
@@ -28,9 +35,10 @@ const findAlert = (matcher: RegExp) =>
 describe('GeminiChatPage', () => {
   beforeEach(() => {
     localStorage.clear()
-    vi.clearAllMocks()
+    jest.clearAllMocks()
     mockIsGeminiConfigured.mockReturnValue(true)
     mockIsDidConfigured.mockReturnValue(false)
+    mockGetDidSourceUrl.mockReturnValue(undefined)
     mockGenerateGeminiReply.mockImplementation(async ({ onChunk }: GenerateGeminiReplyArgs) => {
       const reply = 'Here is a concise reply.'
       onChunk?.(reply)

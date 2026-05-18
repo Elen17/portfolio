@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { generateGeminiReply, isGeminiConfigured, type ChatMessage } from '../../api/gemini'
-import { createTalk, isDidConfigured, pollTalkUntilTerminal } from '../../api/did'
+import { createTalk, getDidSourceUrl, isDidConfigured, pollTalkUntilTerminal } from '../../api/did'
 import avatarImg from '../../assets/avatar.png'
 import cvMarkdown from '../../../cv.md?raw'
 import { DID_INTRO_PROMPT, STORAGE_KEY, SUGGESTIONS } from './consts'
@@ -26,7 +26,7 @@ export default function GeminiChatPage() {
   const [didErr, setDidErr] = useState<string | null>(null)
 
   const configured = isGeminiConfigured()
-  const didSourceUrl = import.meta.env.VITE_DID_SOURCE_URL?.trim()
+  const didSourceUrl = getDidSourceUrl()
   const didReady = isDidConfigured() && Boolean(didSourceUrl)
   const didBusy = didPhase === 'script' || didPhase === 'talk' || didPhase === 'polling'
 
