@@ -1,4 +1,4 @@
-import { DeleteOutlined, SendOutlined } from '@ant-design/icons'
+import { AudioMutedOutlined, AudioOutlined, DeleteOutlined, PauseCircleOutlined, SendOutlined, SoundOutlined } from '@ant-design/icons'
 import { Alert, Button, Card, Input, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -10,6 +10,8 @@ import cvMarkdown from '../../../cv.md?raw'
 import { DID_INTRO_PROMPT, STORAGE_KEY, SUGGESTIONS } from './consts'
 import { createId, loadStoredMessages } from './utils'
 import './styles.css'
+
+const INTRO_VIDEO='public/intro.mp4';
 
 const { Title, Text, Paragraph } = Typography
 
@@ -25,6 +27,44 @@ export default function GeminiChatPage() {
   const [didVideo, setDidVideo] = useState<string | null>(null)
   const [didErr, setDidErr] = useState<string | null>(null)
 
+  const [speakingId, setSpeakingId] = useState<string | null>(null)
+  const speechSupported =
+    typeof window !== 'undefined' && typeof window.speechSynthesis !== 'undefined';
+
+  const stopSpeaking = () => {
+    if (!speechSupported) return
+    window.speechSynthesis.cancel()
+    setSpeakingId(null)
+  }
+
+  const speak = (id: string, text: string) => {
+    if (!speechSupported) return
+    if (speakingId === id) {
+      stopSpeaking()
+      return
+    }
+    const plain = text
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`([^`]*)`/g, '$1')
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/[*_>#~]/g, '')
+      .trim()
+    if (!plain) return
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(plain)
+    utterance.onend = () => setSpeakingId((curr) => (curr === id ? null : curr))
+    utterance.onerror = () => setSpeakingId((curr) => (curr === id ? null : curr))
+    setSpeakingId(id)
+    window.speechSynthesis.speak(utterance)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (speechSupported) window.speechSynthesis.cancel()
+    }
+  }, [speechSupported])
+
   const configured = isGeminiConfigured()
   const didSourceUrl = getDidSourceUrl()
   const didReady = isDidConfigured() && Boolean(didSourceUrl)
@@ -33,6 +73,63 @@ export default function GeminiChatPage() {
   const abortRef = useRef<AbortController | null>(null)
   const didAbortRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
+
+  const [listening, setListening] = useState(false)
+  const recognitionRef = useRef<{ stop: () => void; abort: () => void } | null>(null)
+  const SpeechRecognitionCtor =
+    typeof window !== 'undefined'
+      ? (window as unknown as {
+          SpeechRecognition?: new () => SpeechRecognition
+          webkitSpeechRecognition?: new () => SpeechRecognition
+        }).SpeechRecognition ??
+        (window as unknown as {
+          SpeechRecognition?: new () => SpeechRecognition
+          webkitSpeechRecognition?: new () => SpeechRecognition
+        }).webkitSpeechRecognition
+      : undefined
+  const recognitionSupported = Boolean(SpeechRecognitionCtor)
+
+  const stopListening = () => {
+    recognitionRef.current?.stop()
+  }
+
+  const startListening = () => {
+    if (!SpeechRecognitionCtor || busy) return
+    if (listening) {
+      stopListening()
+      return
+    }
+    const recognition = new SpeechRecognitionCtor()
+    recognition.lang = 'en-US'
+    recognition.interimResults = false
+    recognition.continuous = false
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const parts: string[] = []
+      for (let i = 0; i < event.results.length; i++) {
+        parts.push(event.results[i][0]?.transcript ?? '')
+      }
+      const transcript = parts.join(' ').trim()
+      if (!transcript) return
+      setDraft((prev) => (prev ? `${prev} ${transcript}` : transcript))
+    }
+    recognition.onend = () => {
+      setListening(false)
+      recognitionRef.current = null
+    }
+    recognition.onerror = () => {
+      setListening(false)
+      recognitionRef.current = null
+    }
+    recognitionRef.current = recognition
+    setListening(true)
+    recognition.start()
+  }
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.abort()
+    }
+  }, [])
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -96,6 +193,11 @@ export default function GeminiChatPage() {
       setDidPhase('error')
       return
     }
+    if (INTRO_VIDEO) {
+      setDidVideo(INTRO_VIDEO);
+      setDidPhase('done')
+      return;
+    }
     setDidPhase('script')
     setDidErr(null)
     setDidVideo(null)
@@ -132,7 +234,7 @@ export default function GeminiChatPage() {
   const resetDid = () => {
     didAbortRef.current?.abort()
     setDidPhase('idle')
-    setDidVideo(null)
+    setDidVideo(INTRO_VIDEO);
     setDidErr(null)
   }
 
@@ -140,6 +242,7 @@ export default function GeminiChatPage() {
 
   const clear = () => {
     abortRef.current?.abort()
+    stopSpeaking()
     setBusy(false)
     setError(null)
     setMessages([])
@@ -289,7 +392,19 @@ export default function GeminiChatPage() {
                     .filter(Boolean)
                     .join(' ')}
                 >
-                  <Text className="gchat-bubble__role">{m.role === 'user' ? 'You' : 'Gemini'}</Text>
+                  <div className="gchat-bubble__header">
+                    <Text className="gchat-bubble__role">{m.role === 'user' ? 'You' : 'Gemini'}</Text>
+                    {speechSupported && m.text.trim() && (
+                      <Button
+                        type="text"
+                        size="small"
+                        className="gchat-bubble__audio"
+                        icon={speakingId === m.id ? <PauseCircleOutlined /> : <SoundOutlined />}
+                        aria-label={speakingId === m.id ? 'Stop reading message' : 'Read message aloud'}
+                        onClick={() => speak(m.id, m.text)}
+                      />
+                    )}
+                  </div>
                   {m.role === 'user' ? (
                     <div className="gchat-bubble__text">{m.text}</div>
                   ) : (
@@ -322,6 +437,15 @@ export default function GeminiChatPage() {
             autoSize={{ minRows: 1, maxRows: 5 }}
             aria-label="Message input"
           />
+          {recognitionSupported && (
+            <Button
+              icon={listening ? <AudioMutedOutlined /> : <AudioOutlined />}
+              onClick={startListening}
+              disabled={busy}
+              aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+              danger={listening}
+            />
+          )}
           <Button
             type="primary"
             icon={<SendOutlined />}

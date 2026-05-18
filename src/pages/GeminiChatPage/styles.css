@@ -127,6 +127,17 @@
   margin-bottom: 6px;
 }
 
+.gchat-bubble__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.gchat-bubble__audio {
+  margin-bottom: 6px;
+}
+
 .gchat-bubble__text {
   white-space: pre-wrap;
   line-height: 1.45;

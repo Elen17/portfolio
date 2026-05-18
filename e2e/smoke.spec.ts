@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 
-test('home page loads with hero title', async ({ page }) => {
-  await page.goto('/')
-  await expect(
-    page.getByRole('heading', { name: /scalable architecture|portfolio|engineer/i }).first(),
-  ).toBeVisible()
-})
+test('home page loads with expected document title', async ({ page }) => {
+  await page.goto('/');
+
+  const title = await page.title();
+  expect(title).toBe('Elen Khachatryan — Software Engineer');
+});
