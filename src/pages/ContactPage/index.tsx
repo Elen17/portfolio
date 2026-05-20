@@ -2,7 +2,7 @@ import { EnvironmentOutlined, MailOutlined, SendOutlined, ReloadOutlined } from 
 import { App, Button, Card, Col, Form, Input, Row, Select, Space, Typography } from 'antd'
 import { useState } from 'react'
 import { sendContactMessage, type ContactMessage } from '../../api/emailjs'
-import { sendMessage } from '../../api/telegram/client'
+import { sendMessage } from '../../api/telegram'
 import { SUBJECT_OPTIONS } from './consts'
 import './styles.css'
 
