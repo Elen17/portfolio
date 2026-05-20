@@ -11,8 +11,6 @@ import { DID_INTRO_PROMPT, STORAGE_KEY, SUGGESTIONS } from './consts'
 import { createId, loadStoredMessages } from './utils'
 import './styles.css'
 
-const INTRO_VIDEO='public/intro.mp4';
-
 const { Title, Text, Paragraph } = Typography
 
 type DidPhase = 'idle' | 'script' | 'talk' | 'polling' | 'done' | 'error'
@@ -193,8 +191,8 @@ export default function GeminiChatPage() {
       setDidPhase('error')
       return
     }
-    if (INTRO_VIDEO) {
-      setDidVideo(INTRO_VIDEO);
+    if (import.meta.env.VITE_VIDEO_PATH_URL) {
+      setDidVideo(import.meta.env.VITE_VIDEO_PATH_URL);
       setDidPhase('done')
       return;
     }
@@ -234,7 +232,7 @@ export default function GeminiChatPage() {
   const resetDid = () => {
     didAbortRef.current?.abort()
     setDidPhase('idle')
-    setDidVideo(INTRO_VIDEO);
+    setDidVideo(import.meta.env.VITE_VIDEO_PATH_URL);
     setDidErr(null)
   }
 
