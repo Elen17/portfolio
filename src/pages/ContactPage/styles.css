@@ -181,7 +181,6 @@
 }
 
 .contact2-submit {
-  min-width: 220px;
   justify-content: space-between;
 }
 
@@ -196,6 +195,10 @@
 .contact2-map__img {
   width: 100%;
   display: block;
+}
+
+.contact2-rest {
+  margin-left: 345px;
 }
 
 @media (max-width: 767px) {

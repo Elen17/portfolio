@@ -1,6 +1,8 @@
+import axios, { type AxiosError } from 'axios'
 import type { TalkResponse, TalkStatus } from './types'
 
-const DID_BASE_URL = 'https://api.d-id.com'
+const DID_BASE_URL = import.meta.env.VITE_DID_BASE_URL
+
 const POLL_INTERVAL_MS = 2_000
 const POLL_TIMEOUT_MS = 180_000
 
@@ -24,13 +26,9 @@ function authHeader(): string {
   return `Basic ${btoa(`${key}:`)}`
 }
 
-async function readErrorMessage(response: Response, fallback: string): Promise<string> {
-  try {
-    const data = (await response.json()) as { error?: { message?: string; description?: string; kind?: string } }
-    return data.error?.message ?? data.error?.description ?? data.error?.kind ?? fallback
-  } catch {
-    return fallback
-  }
+function readErrorMessage(err: AxiosError<{ error?: { message?: string; description?: string; kind?: string } }>, fallback: string): string {
+  const e = err.response?.data?.error
+  return e?.message ?? e?.description ?? e?.kind ?? fallback
 }
 
 export async function createTalk(args: {
@@ -38,32 +36,33 @@ export async function createTalk(args: {
   text: string
   signal?: AbortSignal
 }): Promise<TalkResponse> {
-  const res = await fetch(`${DID_BASE_URL}/talks`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authHeader(),
-    },
-    body: JSON.stringify({
-      source_url: args.sourceUrl,
-      script: { type: 'text', input: args.text },
-    }),
-    signal: args.signal,
-  })
-  if (!res.ok) throw new Error(await readErrorMessage(res, `Create talk failed (HTTP ${res.status}).`))
-  return (await res.json()) as TalkResponse
+  try {
+    const { data } = await axios.post<TalkResponse>(
+      `${DID_BASE_URL}/talks`,
+      { source_url: args.sourceUrl, script: { type: 'text', input: args.text } },
+      { headers: { Authorization: authHeader() }, signal: args.signal },
+    )
+    return data
+  } catch (err) {
+    if (axios.isCancel(err)) throw new DOMException('Aborted', 'AbortError')
+    throw new Error(readErrorMessage(err as any, `Create talk failed (HTTP ${axios.isAxiosError(err) ? err.response?.status : 'unknown'}).`))
+  }
 }
 
 export async function getTalk(args: {
   id: string
   signal?: AbortSignal
 }): Promise<TalkResponse> {
-  const res = await fetch(`${DID_BASE_URL}/talks/${encodeURIComponent(args.id)}`, {
-    headers: { Authorization: authHeader() },
-    signal: args.signal,
-  })
-  if (!res.ok) throw new Error(await readErrorMessage(res, `Get talk failed (HTTP ${res.status}).`))
-  return (await res.json()) as TalkResponse
+  try {
+    const { data } = await axios.get<TalkResponse>(
+      `${DID_BASE_URL}/talks/${encodeURIComponent(args.id)}`,
+      { headers: { Authorization: authHeader() }, signal: args.signal },
+    )
+    return data
+  } catch (err) {
+    if (axios.isCancel(err)) throw new DOMException('Aborted', 'AbortError')
+    throw new Error(readErrorMessage(err as any, `Get talk failed (HTTP ${axios.isAxiosError(err) ? err.response?.status : 'unknown'}).`))
+  }
 }
 
 const TERMINAL_STATUSES: TalkStatus[] = ['done', 'error', 'rejected']

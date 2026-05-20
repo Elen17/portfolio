@@ -1,7 +1,8 @@
-import { EnvironmentOutlined, MailOutlined } from '@ant-design/icons'
+import { EnvironmentOutlined, MailOutlined, SendOutlined, ReloadOutlined } from '@ant-design/icons'
 import { App, Button, Card, Col, Form, Input, Row, Select, Space, Typography } from 'antd'
 import { useState } from 'react'
 import { sendContactMessage, type ContactMessage } from '../../api/emailjs'
+import { sendMessage } from '../../api/telegram/client'
 import { SUBJECT_OPTIONS } from './consts'
 import './styles.css'
 
@@ -13,18 +14,17 @@ export default function ContactPage() {
   const [form] = Form.useForm<ContactValues>()
   const { notification } = App.useApp()
   const [submitting, setSubmitting] = useState(false)
+  const [sendingTelegram, setSendingTelegram] = useState(false)
 
   const handleSubmit = async (values: ContactValues) => {
     setSubmitting(true)
     try {
       await sendContactMessage(values)
-
       notification.success({
         message: 'Message sent',
         description: 'Your message has been sent successfully. Please check your email for a response.',
         placement: 'topRight',
       })
-
       form.resetFields()
     } catch (error) {
       console.error(error)
@@ -35,6 +35,42 @@ export default function ContactPage() {
       })
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleTelegram = async () => {
+    try {
+      const values = await form.validateFields()
+      setSendingTelegram(true)
+
+      const text = [
+        `<b>New message from portfolio</b>`,
+        `<b>Name:</b> ${values.name}`,
+        `<b>Email:</b> ${values.email}`,
+        `<b>Subject:</b> ${values.subject}`,
+        `<b>Message:</b>\n${values.message}`,
+      ].join('\n')
+
+      await sendMessage({ text })
+
+      notification.success({
+        message: 'Sent via Telegram',
+        description: 'Your message has been forwarded to Telegram.',
+        placement: 'topRight',
+      })
+      form.resetFields()
+    } catch (error) {
+      // form.validateFields() rejects with a validation error — don't show a notification for that
+      if (error instanceof Error) {
+        console.error(error)
+        notification.error({
+          message: 'Telegram failed',
+          description: 'Something went wrong while sending to Telegram. Please try again later.',
+          placement: 'topRight',
+        })
+      }
+    } finally {
+      setSendingTelegram(false)
     }
   }
 
@@ -74,8 +110,15 @@ export default function ContactPage() {
               layout="vertical"
               requiredMark={false}
               onFinish={handleSubmit}
-              disabled={submitting}
+              disabled={submitting || sendingTelegram}
             >
+              
+              <Button htmlType="button" 
+                icon={<ReloadOutlined/>}
+                onClick={() => form.resetFields()}
+                className="contact2-rest"
+                />
+
               <Form.Item<ContactValues>
                 label="Your name"
                 name="name"
@@ -117,8 +160,13 @@ export default function ContactPage() {
                 >
                   Dispatch Message
                 </Button>
-                <Button htmlType="button" onClick={() => form.resetFields()}>
-                  Reset
+                <Button
+                  htmlType="button"
+                  icon={<SendOutlined />}
+                  loading={sendingTelegram}
+                  onClick={handleTelegram}
+                >
+                  Send via Telegram
                 </Button>
               </Space>
             </Form>
